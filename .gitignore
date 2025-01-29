@@ -1,0 +1,11 @@
+# FRONTEND
+/client/.next/
+
+/client/node_modules
+
+# BACKEND
+/system/core/node_modules
+
+/system/core/logs
+
+/system/core/.env.production

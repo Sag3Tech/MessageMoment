@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    /* LANGUAGE & ENVOIRMENT */
+    "target": "es2016",
+
+    /* MODULES */
+    "module": "commonjs",
+
+    /* INTEROP & CONSTRAINTS */
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* TYPE CHECKING */
+    "strict": true,
+
+    /* COMPLETENESS */
+    "skipLibCheck": true
+  }
+}
