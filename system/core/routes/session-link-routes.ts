@@ -7,4 +7,4 @@ const SessionLinkRouter = express.Router();
 // API PATHS
 SessionLinkRouter.post("/generate-session-link", GenerateSessionLinkFunction);
 
-export default SessionLinkRouter;
+export default SessionLinkRouter; 
