@@ -2,8 +2,6 @@ import { NextFunction, Request, Response } from "express";
 
 import { SessionTypeEnum } from "../enums/session-type-enum";
 
-import SessionLinkModel from "../models/session-link-model";
-
 import { StoreSessionLinkData } from "../services/session-services";
 
 import { CatchAsyncErrors } from "../middlewares/catch-async-errors";
@@ -35,7 +33,6 @@ export const GenerateSessionLinkFunction = CatchAsyncErrors(
         sessionType,
         secureSecurityCode,
         sessionIp,
-        isUsed: false,
       };
 
       await StoreSessionLinkData(sessionId, sessionData);

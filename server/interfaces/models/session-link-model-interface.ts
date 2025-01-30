@@ -7,7 +7,6 @@ export interface ISessionLink extends Document {
   sessionType: SessionTypeEnum;
   secureSecurityCode?: string;
   sessionIp: string;
-  isUsed: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

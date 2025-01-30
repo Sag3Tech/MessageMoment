@@ -1,25 +1,24 @@
-import mongoose from "mongoose";
 import "dotenv-flow/config";
+
+import mongoose from "mongoose";
 
 import { RetryHandler } from "../middlewares/retry-handler";
 
 import logger from "../utils/logger";
 
-/**
- * Mongoose Database Connection Function
- */
+// MONGOOSE DATABASE CONNECTION
 const MongooseDatabaseOperation = async (): Promise<void> => {
   const connection = await mongoose.connect(
     process.env.MONGOOSE_DATABASE_URL || ""
   );
 
-  logger.info(`Mongoose database is running on url: ${connection.connection.host}`);
+  logger.info(
+    `Mongoose database is running on url: ${connection.connection.host}`
+  );
   global.mongooseConnection = connection.connection;
 };
 
-/**
- * Connect to Mongoose Database with Retry Mechanism
- */
+// CONNECT TO MONGOOSE DATABASE WITH RETRY MECHANISM
 const ConnectMongooseDatabase = async (): Promise<void> => {
   try {
     await RetryHandler(MongooseDatabaseOperation, {
@@ -27,13 +26,13 @@ const ConnectMongooseDatabase = async (): Promise<void> => {
       retryDelay: parseInt(process.env.RETRY_DELAY || "5000", 10),
     });
   } catch (error) {
-    logger.error(`Failed to connect to mongoose database: ${(error as Error).message}`);
+    logger.error(
+      `Failed to connect to mongoose database: ${(error as Error).message}`
+    );
   }
 };
 
-/**
- * Disconnect Mongoose Database Database
- */
+// DISCONNECT MONGOOSE DATABASE
 const DisconnectMongooseDatabase = async (): Promise<void> => {
   if (global.mongooseConnection) {
     try {
@@ -41,7 +40,9 @@ const DisconnectMongooseDatabase = async (): Promise<void> => {
       logger.info("Mongoose database connection closed successfully.");
     } catch (error) {
       logger.error(
-        `Error closing mongoose database connection: ${(error as Error).message}`
+        `Error closing mongoose database connection: ${
+          (error as Error).message
+        }`
       );
     }
   } else {

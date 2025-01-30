@@ -1,6 +1,9 @@
 import "dotenv-flow/config";
 
+import http from "http";
+
 import { app } from "./app";
+import { SetupSocketServer } from "./socket";
 
 import {
   ConnectMongooseDatabase,
@@ -15,14 +18,19 @@ import logger from "./utils/logger";
 
 HandleUncaughtException();
 
+const server = http.createServer(app);
+
 const StartServer = async (): Promise<void> => {
   try {
-    const server = app.listen(process.env.PORT, async () => {
+    server.listen(process.env.PORT, () => {
       logger.info(`Server is running on port: ${process.env.PORT}`);
-
-      await ConnectMongooseDatabase();
-      await ConnectRedis();
     });
+
+    await ConnectMongooseDatabase();
+    await ConnectRedis();
+
+    SetupSocketServer(server);
+    logger.info("Socket.io server is running");
 
     HandleUnhandledRejection(server);
 

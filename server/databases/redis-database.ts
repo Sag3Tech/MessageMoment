@@ -1,5 +1,6 @@
-import Redis from "ioredis";
 import "dotenv-flow/config";
+
+import Redis from "ioredis";
 
 import { RetryHandler } from "../middlewares/retry-handler";
 
@@ -7,9 +8,7 @@ import logger from "../utils/logger";
 
 let RedisDatabase: Redis | null = null;
 
-/**
- * Redis Connection Handler
- */
+// REDIS CONNETION HANDLER
 const RedisOperation = async (): Promise<void> => {
   if (!RedisDatabase) {
     RedisDatabase = new Redis(process.env.REDIS_URL || "");
@@ -19,9 +18,7 @@ const RedisOperation = async (): Promise<void> => {
   logger.info("Redis connected!");
 };
 
-/**
- * Connect to Redis with Retry Mechanism
- */
+// CONNECT TO REDIS WITH RETRY MECHANISM
 const ConnectRedis = async (): Promise<void> => {
   try {
     await RetryHandler(RedisOperation, {
@@ -41,9 +38,7 @@ const ConnectRedis = async (): Promise<void> => {
   }
 };
 
-/**
- * Disconnect Redis Database
- */
+// DISCONNECT REDIS DATABASE
 const DisconnectRedis = async (): Promise<void> => {
   if (RedisDatabase) {
     try {
@@ -59,4 +54,41 @@ const DisconnectRedis = async (): Promise<void> => {
   }
 };
 
-export { ConnectRedis, DisconnectRedis, RedisDatabase };
+// SUBSCRIBE TO REDIS CHANNELS
+const SubscribeToRedisChannel = (channel: string, callback: Function) => {
+  if (RedisDatabase) {
+    RedisDatabase.subscribe(channel, (err, count) => {
+      if (err) {
+        logger.error(`Failed to subscribe to channel: ${channel}`);
+      } else {
+        logger.info(
+          `Subscribed to ${channel} channel. Currently subscribed to ${count} channels.`
+        );
+      }
+    });
+
+    // Handle message on the subscribed channel
+    RedisDatabase.on("message", (channel, message) => {
+      logger.info(`Message received from ${channel}: ${message}`);
+      callback(message);
+    });
+  }
+};
+
+// PUBLISH A MESSAGE TO REDIS CHANNEL
+const PublishToRedisChannel = (channel: string, message: string): void => {
+  if (RedisDatabase) {
+    RedisDatabase.publish(channel, message); // Publish a message to the specified channel
+    logger.info(`Message sent to ${channel}: ${message}`);
+  } else {
+    logger.error("Redis connection is not established!");
+  }
+};
+
+export {
+  ConnectRedis,
+  DisconnectRedis,
+  RedisDatabase,
+  SubscribeToRedisChannel,
+  PublishToRedisChannel,
+};

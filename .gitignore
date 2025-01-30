@@ -4,8 +4,8 @@
 /client/node_modules
 
 # BACKEND
-/system/core/node_modules
+/server/node_modules
 
-/system/core/logs
+/server/logs
 
-/system/core/.env.production
+/server/.env.production
