@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 
 import { SessionTypeEnum } from "../enums/session-type-enum";
 
-import { StoreSessionLinkData } from "../services/session-services";
+import { StoreSessionLinkService } from "../services/store-session-link-service";
 
 import { CatchAsyncErrors } from "../middlewares/catch-async-errors";
 import { ErrorHandler } from "../middlewares/error-handler";
@@ -35,7 +35,7 @@ export const GenerateSessionLinkFunction = CatchAsyncErrors(
         sessionIp,
       };
 
-      await StoreSessionLinkData(sessionId, sessionData);
+      await StoreSessionLinkService(sessionId, sessionData);
 
       return res.status(201).json({
         success: true,

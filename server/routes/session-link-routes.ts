@@ -1,10 +1,10 @@
 import express from "express";
 
-import { GenerateSessionLinkFunction } from "../controllers/session-link-controllers";
+import { GenerateSessionLinkFunction } from "../controllers/session-controllers";
 
-const SessionLinkRouter = express.Router();
+const SessionRouter = express.Router();
 
 // API PATHS
-SessionLinkRouter.post("/generate-session-link", GenerateSessionLinkFunction);
+SessionRouter.post("/generate-session-link", GenerateSessionLinkFunction);
 
-export default SessionLinkRouter; 
+export default SessionRouter;

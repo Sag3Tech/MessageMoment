@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Session Link Generation Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      select,
+      button {
+        padding: 10px;
+        margin-top: 10px;
+        width: 100%;
+      }
+      .result {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        background-color: #f9f9f9;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Session Link Generation Test</h2>
+      <p>
+        Select the session type and click "Generate Link" to test the backend.
+      </p>
+
+      <label for="session-type">Select Session Type:</label>
+      <select id="session-type">
+        <option value="standard">Standard</option>
+        <option value="secure">Secure</option>
+        <option value="wallet">Wallet</option>
+      </select>
+
+      <button id="generate-link">Generate Link</button>
+
+      <div id="result" class="result" style="display: none">
+        <h3>Generated Session Link</h3>
+        <p><strong>Session ID:</strong> <span id="session-id"></span></p>
+        <p>
+          <strong>Security Code (if Secure):</strong>
+          <span id="security-code"></span>
+        </p>
+        <p>
+          <strong>Expiration Time:</strong> <span id="expiration-time"></span>
+        </p>
+        <h3>Session Data Sent to Redis:</h3>
+        <pre id="redis-data"></pre>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("generate-link")
+        .addEventListener("click", async function () {
+          const sessionType = document.getElementById("session-type").value;
+
+          const response = await fetch(
+            "http://localhost:8000/api/v1/generate-session-link",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ sessionType }),
+            }
+          );
+
+          if (!response.ok) {
+            alert("Error generating session link.");
+            return;
+          }
+
+          const data = await response.json();
+
+          if (data.success) {
+            const sessionId = data.data.sessionId;
+            const secureSecurityCode = data.data.secureSecurityCode || "N/A";
+            const expirationTime = new Date(
+              Date.now() + 1800 * 1000
+            ).toLocaleString();
+
+            document.getElementById("session-id").innerText = sessionId;
+            document.getElementById("security-code").innerText =
+              secureSecurityCode;
+            document.getElementById("expiration-time").innerText =
+              expirationTime;
+
+            const sessionData = {
+              sessionId,
+              sessionType,
+              secureSecurityCode,
+              expirationTime,
+            };
+
+            document.getElementById("redis-data").innerText = JSON.stringify(
+              sessionData,
+              null,
+              2
+            );
+            document.getElementById("result").style.display = "block";
+          } else {
+            alert("Failed to generate session link.");
+          }
+        });
+    </script>
+  </body>
+</html>

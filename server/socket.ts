@@ -9,6 +9,8 @@ import logger from "./utils/logger";
 
 const InitializeSocketEvents = (io: SocketIOServer) => {
   io.on("connection", (socket) => {
+    (socket.request as any).socketId = socket.id;
+
     logger.info(`New socket connection: ${socket.id}`);
 
     JoinRoomEvent(socket);
@@ -27,6 +29,8 @@ const SetupSocketServer = (server: any) => {
   });
 
   InitializeSocketEvents(io);
+
+  return io;
 };
 
 export { SetupSocketServer };

@@ -29,7 +29,12 @@ const StartServer = async (): Promise<void> => {
     await ConnectMongooseDatabase();
     await ConnectRedis();
 
-    SetupSocketServer(server);
+    const io = SetupSocketServer(server);
+    app.use((req, res, next) => {
+      req.io = io;
+      next();
+    });
+
     logger.info("Socket.io server is running");
 
     HandleUnhandledRejection(server);

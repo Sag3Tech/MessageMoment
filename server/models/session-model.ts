@@ -10,39 +10,72 @@ const SessionSchema: Schema<ISession> = new Schema(
       required: true,
       unique: true,
     },
+
     sessionType: {
       type: String,
       enum: Object.values(SessionTypeEnum),
       required: true,
     },
-    sessionDuration: {
-      type: Number,
-      required: true,
+
+    secureSecurityCode: {
+      type: String,
+      required: function () {
+        return this.sessionType === SessionTypeEnum.SECURE;
+      },
     },
+
     sessionIp: {
       type: String,
       required: true,
     },
+
     sessionLocation: {
-      type: String,
+      type: {
+        lat: Number,
+        lon: Number,
+        country: String,
+        city: String,
+      },
     },
+
+    sessionDuration: {
+      type: Number,
+    },
+
     participants: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Participant",
       },
     ],
+
+    activeUsers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Participant",
+      },
+    ],
+
     messages: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Message",
       },
     ],
-    secureSecurityCode: {
-      type: String,
-      required: function () {
-        return this.sessionType === SessionTypeEnum.SECURE;
-      },
+
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+
+    expiredAt: {
+      type: Date,
+      default: null,
+    },
+
+    realTimeDuration: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }
