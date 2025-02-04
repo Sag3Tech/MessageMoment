@@ -1,20 +1,24 @@
-import { SessionTypeEnum } from "../../enums/session-type-enum";
-import { IMessage } from "./message-model-interface";
+import mongoose, { Document } from "mongoose";
 import { IParticipant } from "./participant-model-interface";
 
 export interface ISession extends Document {
   sessionId: string;
-  sessionType: SessionTypeEnum;
+  sessionType: string;
   secureSecurityCode?: string;
   sessionIp: string;
-  sessionLocation?: { lat: number; lon: number; country: string; city: string };
-  sessionDuration: number;
+  city: string;
+  region: string;
+  country: string;
+  coordinates: [number, number];
+  participants: mongoose.Types.ObjectId[];
+  activeUsers: mongoose.Types.ObjectId[];
+  isExpired: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+// For populated sessions
+export interface IPopulatedSession extends Omit<ISession, "participants" | "activeUsers"> {
   participants: IParticipant[];
   activeUsers: IParticipant[];
-  messages: IMessage[];
-  isActive?: boolean;
-  expiredAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-  realTimeDuration: number;
 }

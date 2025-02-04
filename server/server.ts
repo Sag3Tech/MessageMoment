@@ -1,55 +1,37 @@
 import "dotenv-flow/config";
 
-import http from "http";
+import { createServer } from "http";
 
 import { app } from "./app";
-import { SetupSocketServer } from "./socket";
+import { InitializeSocket } from "./socket";
 
-import {
-  ConnectMongooseDatabase,
-  DisconnectMongooseDatabase,
-} from "./databases/mongoose-database";
-import { ConnectRedis, DisconnectRedis } from "./databases/redis-database";
+import { ConnectMongooseDatabase } from "./databases/mongoose-database";
+import { ConnectRedis } from "./databases/redis-database";
 
-import { HandleUncaughtException } from "./middlewares/uncaught-exception-handler";
-import { HandleUnhandledRejection } from "./middlewares/unhandled-rejection-handler";
+import { HandleException } from "./middlewares/exception-handler";
+import { HandleRejection } from "./middlewares/rejection-handler";
+import { GracefullyShutdown } from "./middlewares/gracefully-shutdown";
 
-import logger from "./utils/logger";
+import Logger from "./utils/logger";
 
-HandleUncaughtException();
+HandleException();
 
-const server = http.createServer(app);
+const server = createServer(app);
+InitializeSocket(server);
 
 const StartServer = async (): Promise<void> => {
   try {
     server.listen(process.env.PORT, () => {
-      logger.info(`Server is running on port: ${process.env.PORT}`);
+      console.info(`Server is running on port: ${process.env.PORT}`);
     });
 
     await ConnectMongooseDatabase();
     await ConnectRedis();
 
-    const io = SetupSocketServer(server);
-    app.use((req, res, next) => {
-      req.io = io;
-      next();
-    });
-
-    logger.info("Socket.io server is running");
-
-    HandleUnhandledRejection(server);
-
-    process.on("SIGINT", async () => {
-      logger.info("Shutting down gracefully...");
-      await DisconnectMongooseDatabase();
-      await DisconnectRedis();
-      server.close(() => {
-        logger.info("HTTP server closed.");
-        process.exit(0);
-      });
-    });
+    HandleRejection(server);
+    GracefullyShutdown(server);
   } catch (error) {
-    logger.error(`Failed to start the server: ${(error as Error).message}`);
+    Logger.error(`Failed to start the server: ${(error as Error).message}`);
     process.exit(1);
   }
 };

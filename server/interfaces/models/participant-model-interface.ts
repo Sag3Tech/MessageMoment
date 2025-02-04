@@ -1,11 +1,18 @@
-import mongoose, { Document } from "mongoose";
+import { Document } from "mongoose";
 
 export interface IParticipant extends Document {
-  _id: mongoose.Schema.Types.ObjectId;
-  sessionId: mongoose.Schema.Types.ObjectId;
+  sessionId: string;
   participantId: string;
   username: string;
   isActive: boolean;
+  assignedColor: string;
+  connectionLocation: {
+    city: string;
+    region: string;
+    country: string;
+    coordinates: [number, number];
+  };
   joinedAt: Date;
-  leftAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

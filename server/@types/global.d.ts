@@ -1,19 +1,23 @@
-import { Server as HttpServer } from "http";
-import { Server as SocketIOServer } from "socket.io";
-import mongoose from "mongoose";
+import { Connection } from "mongoose";
 
 declare global {
-  var mongooseConnection: mongoose.Connection | undefined;
+  var mongooseConnection: Connection | undefined;
 }
 
-declare module "http" {
-  interface IncomingMessage {
-    io: SocketIOServer;
+// typings/ipinfo.d.ts
+declare module 'ipinfo' {
+  interface IPInfo {
+    ip: string;
+    city?: string;
+    region?: string;
+    country?: string;
+    loc?: string;
+    // Add other properties you need
   }
-}
 
-declare module "express" {
-  export interface Request {
-    socketId?: string;
+  interface IPInfoClient {
+    lookup(ip: string): Promise<IPInfo>;
   }
+
+  export function createClient(config: { token: string }): IPInfoClient;
 }

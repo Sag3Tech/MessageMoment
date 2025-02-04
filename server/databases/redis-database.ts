@@ -4,7 +4,7 @@ import Redis from "ioredis";
 
 import { RetryHandler } from "../middlewares/retry-handler";
 
-import logger from "../utils/logger";
+import Logger from "../utils/logger";
 
 let RedisDatabase: Redis | null = null;
 
@@ -15,7 +15,6 @@ const RedisOperation = async (): Promise<void> => {
   }
 
   await RedisDatabase.ping();
-  logger.info("Redis connected!");
 };
 
 // CONNECT TO REDIS WITH RETRY MECHANISM
@@ -27,14 +26,14 @@ const ConnectRedis = async (): Promise<void> => {
     });
 
     RedisDatabase?.on("connect", () => {
-      logger.info("Redis connection established successfully.");
+      console.info("Redis connection established successfully.");
     });
 
     RedisDatabase?.on("error", (err) => {
-      logger.error(`Redis connection error: ${err.message}`);
+      Logger.error(`Redis connection error: ${err.message}`);
     });
   } catch (error) {
-    logger.error(`Failed to connect to Redis: ${(error as Error).message}`);
+    Logger.error(`Failed to connect to Redis: ${(error as Error).message}`);
   }
 };
 
@@ -43,14 +42,14 @@ const DisconnectRedis = async (): Promise<void> => {
   if (RedisDatabase) {
     try {
       await RedisDatabase.quit();
-      logger.info("Redis connection closed successfully.");
+      console.info("Redis connection closed successfully.");
     } catch (error) {
-      logger.error(
+      Logger.error(
         `Error during Redis disconnection: ${(error as Error).message}`
       );
     }
   } else {
-    logger.warn("No Redis connection found to close.");
+    Logger.warn("No Redis connection found to close.");
   }
 };
 
@@ -59,9 +58,9 @@ const SubscribeToRedisChannel = (channel: string, callback: Function) => {
   if (RedisDatabase) {
     RedisDatabase.subscribe(channel, (err, count) => {
       if (err) {
-        logger.error(`Failed to subscribe to channel: ${channel}`);
+        Logger.error(`Failed to subscribe to channel: ${channel}`);
       } else {
-        logger.info(
+        console.info(
           `Subscribed to ${channel} channel. Currently subscribed to ${count} channels.`
         );
       }
@@ -69,7 +68,7 @@ const SubscribeToRedisChannel = (channel: string, callback: Function) => {
 
     // Handle message on the subscribed channel
     RedisDatabase.on("message", (channel, message) => {
-      logger.info(`Message received from ${channel}: ${message}`);
+      console.info(`Message received from ${channel}: ${message}`);
       callback(message);
     });
   }
@@ -78,10 +77,10 @@ const SubscribeToRedisChannel = (channel: string, callback: Function) => {
 // PUBLISH A MESSAGE TO REDIS CHANNEL
 const PublishToRedisChannel = (channel: string, message: string): void => {
   if (RedisDatabase) {
-    RedisDatabase.publish(channel, message); // Publish a message to the specified channel
-    logger.info(`Message sent to ${channel}: ${message}`);
+    RedisDatabase.publish(channel, message);
+    console.info(`Message sent to ${channel}: ${message}`);
   } else {
-    logger.error("Redis connection is not established!");
+    Logger.error("Redis connection is not established!");
   }
 };
 

@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 
 import { CustomError } from "../interfaces/middlewares-interfaces";
 
-import { ErrorHandler } from "./error-handler";
 import { CastError } from "./errors/cast-error";
 import { DuplicateKeyError } from "./errors/duplicate-key-error";
 import { ValidationError } from "./errors/validation-error";
@@ -11,6 +10,8 @@ import { UnauthorizedError } from "./errors/unauthorized-error";
 import { InternalServerError } from "./errors/internal-server-error";
 import { BadRequestError } from "./errors/bad-request-error";
 import { DefaultError } from "./errors/default-error";
+
+import { ErrorHandler } from "../utils/error-handler";
 
 export const AppErrorHandler = (
   err: CustomError,

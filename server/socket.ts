@@ -1,36 +1,35 @@
-import { Server as SocketIOServer } from "socket.io";
+import { Server as SocketServer } from "socket.io";
 
-import { JoinRoomEvent } from "./events/join-room-event";
-import { LeaveRoomEvent } from "./events/leave-room-event";
-import { SendMessageEvent } from "./events/send-message-event";
-import { DisconnectEvent } from "./events/disconnect-event";
+import { JoinRoom } from "./events/join-room";
+import { SendMessage } from "./events/send-message";
+import { Disconnect } from "./events/disconnect";
+import { MessageReceived } from "./events/message-received";
+import { LeaveRoom } from "./events/leave-room";
+import { ErrorHandler } from "./events/error-handler";
+import { GetParticipantCount } from "./events/get-participant-count";
 
-import logger from "./utils/logger";
+let io: SocketServer;
 
-const InitializeSocketEvents = (io: SocketIOServer) => {
-  io.on("connection", (socket) => {
-    (socket.request as any).socketId = socket.id;
-
-    logger.info(`New socket connection: ${socket.id}`);
-
-    JoinRoomEvent(socket);
-    LeaveRoomEvent(socket);
-    SendMessageEvent(socket, io);
-    DisconnectEvent(socket);
-  });
-};
-
-const SetupSocketServer = (server: any) => {
-  const io = new SocketIOServer(server, {
+const InitializeSocket = (server: any) => {
+  io = new SocketServer(server, {
     cors: {
       origin: "*",
       methods: ["GET", "POST"],
     },
   });
 
-  InitializeSocketEvents(io);
+  io.on("connection", (socket) => {
+    console.info(`New socket connection: ${socket.id}`);
 
-  return io;
+    JoinRoom(socket);
+    SendMessage(socket);
+    Disconnect(socket);
+    LeaveRoom(socket);
+    ErrorHandler(socket);
+    GetParticipantCount(socket);
+  });
+
+  MessageReceived();
 };
 
-export { SetupSocketServer };
+export { io, InitializeSocket };

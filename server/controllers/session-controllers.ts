@@ -2,52 +2,71 @@ import { NextFunction, Request, Response } from "express";
 
 import { SessionTypeEnum } from "../enums/session-type-enum";
 
-import { StoreSessionLinkService } from "../services/store-session-link-service";
-
-import { CatchAsyncErrors } from "../middlewares/catch-async-errors";
-import { ErrorHandler } from "../middlewares/error-handler";
-
+import { CatchAsyncErrors } from "../utils/catch-async-errors";
+import { ErrorHandler } from "../utils/error-handler";
 import { SessionIdGenerator } from "../utils/session-id-generator";
 import { SecurityCodeGenerator } from "../utils/security-code-generator";
 
-// GENERATE SESSION LINK FUNCTION
+import { StoreSessionLinkService } from "../services/store-session-link-service";
+import { getIPDetails } from "../utils/get-ip-service";
+
 export const GenerateSessionLinkFunction = CatchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { sessionType } = req.body;
 
+      // Validate session type
       if (!Object.values(SessionTypeEnum).includes(sessionType)) {
         return next(new ErrorHandler("Invalid session type", 400));
       }
 
+      // Generate session identifiers
       const sessionId = SessionIdGenerator();
-      let secureSecurityCode: string | undefined;
-      if (sessionType === SessionTypeEnum.SECURE) {
-        secureSecurityCode = SecurityCodeGenerator();
+      const secureSecurityCode =
+        sessionType === SessionTypeEnum.SECURE
+          ? SecurityCodeGenerator()
+          : undefined;
+
+      // Get and validate client IP
+      const rawIp = req.ip;
+      if (!rawIp) {
+        return next(new ErrorHandler("Client IP address not found", 400));
       }
 
-      const sessionIp = req.ip;
+      // Get geolocation data
+      const ipDetails = await getIPDetails(rawIp);
+      const [latitude, longitude] = ipDetails.loc?.split(",") || [null, null];
 
+      // Prepare session data
       const sessionData = {
         sessionId,
         sessionType,
         secureSecurityCode,
-        sessionIp,
+        sessionIp: rawIp,
+        city: ipDetails.city || null,
+        region: ipDetails.region || null,
+        country: ipDetails.country || null,
+        latitude,
+        longitude,
       };
 
+      // Store session data
       await StoreSessionLinkService(sessionId, sessionData);
 
+      // Return response
       return res.status(201).json({
         success: true,
         message: "Session link generated successfully",
         data: {
+          sessionIp: rawIp,
           sessionId,
           sessionType,
           secureSecurityCode,
         },
       });
     } catch (error: any) {
-      return next(new ErrorHandler(error.message, 500));
+      const message = error.response?.data?.error || error.message;
+      return next(new ErrorHandler(message, error.response?.status || 500));
     }
   }
 );

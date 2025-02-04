@@ -1,5 +1,4 @@
 import mongoose, { Schema } from "mongoose";
-
 import { ISession } from "../interfaces/models/session-model-interface";
 import { SessionTypeEnum } from "../enums/session-type-enum";
 
@@ -10,76 +9,56 @@ const SessionSchema: Schema<ISession> = new Schema(
       required: true,
       unique: true,
     },
-
     sessionType: {
       type: String,
-      enum: Object.values(SessionTypeEnum),
+      enum: SessionTypeEnum,
       required: true,
     },
-
     secureSecurityCode: {
       type: String,
-      required: function () {
-        return this.sessionType === SessionTypeEnum.SECURE;
+      required: function (this: ISession) {
+        return this.sessionType === "secure";
       },
     },
-
     sessionIp: {
       type: String,
       required: true,
     },
-
-    sessionLocation: {
-      type: {
-        lat: Number,
-        lon: Number,
-        country: String,
-        city: String,
-      },
+    city: {
+      type: String,
+      default: "Unknown",
     },
-
-    sessionDuration: {
-      type: Number,
+    region: {
+      type: String,
+      default: "Unknown",
     },
-
+    country: {
+      type: String,
+      default: "Unknown",
+    },
+    coordinates: {
+      type: [Number],
+      index: "2dsphere",
+    },
     participants: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Participant",
       },
     ],
-
     activeUsers: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Participant",
       },
     ],
-
-    messages: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Message",
-      },
-    ],
-
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-
-    expiredAt: {
-      type: Date,
-      default: null,
-    },
-
-    realTimeDuration: {
-      type: Number,
-      default: 0,
-    },
+    isExpired: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
+
+//  geospatial index
+SessionSchema.index({ coordinates: "2dsphere" });
 
 const SessionModel = mongoose.model<ISession>("Session", SessionSchema);
 export default SessionModel;

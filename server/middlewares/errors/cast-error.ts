@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 
-import { ErrorHandler } from "../error-handler";
+import { ErrorHandler } from "../../utils/error-handler";
 
 export const CastError = (
   err: any,

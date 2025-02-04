@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 
 import { RetryHandler } from "../middlewares/retry-handler";
 
-import logger from "../utils/logger";
+import Logger from "../utils/logger";
 
 // MONGOOSE DATABASE CONNECTION
 const MongooseDatabaseOperation = async (): Promise<void> => {
@@ -12,7 +12,7 @@ const MongooseDatabaseOperation = async (): Promise<void> => {
     process.env.MONGOOSE_DATABASE_URL || ""
   );
 
-  logger.info(
+  console.info(
     `Mongoose database is running on url: ${connection.connection.host}`
   );
   global.mongooseConnection = connection.connection;
@@ -26,7 +26,7 @@ const ConnectMongooseDatabase = async (): Promise<void> => {
       retryDelay: parseInt(process.env.RETRY_DELAY || "5000", 10),
     });
   } catch (error) {
-    logger.error(
+    Logger.error(
       `Failed to connect to mongoose database: ${(error as Error).message}`
     );
   }
@@ -37,16 +37,16 @@ const DisconnectMongooseDatabase = async (): Promise<void> => {
   if (global.mongooseConnection) {
     try {
       await global.mongooseConnection.close();
-      logger.info("Mongoose database connection closed successfully.");
+      console.info("Mongoose database connection closed successfully.");
     } catch (error) {
-      logger.error(
+      Logger.error(
         `Error closing mongoose database connection: ${
           (error as Error).message
         }`
       );
     }
   } else {
-    logger.warn("No mongoose database connection found to close.");
+    Logger.warn("No mongoose database connection found to close.");
   }
 };
 

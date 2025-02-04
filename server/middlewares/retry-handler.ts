@@ -1,6 +1,6 @@
 import { RetryOptions } from "../interfaces/middlewares-interfaces";
 
-import logger from "../utils/logger";
+import Logger from "../utils/logger";
 
 export const RetryHandler = async (
   operation: () => Promise<void>,
@@ -22,7 +22,7 @@ export const RetryHandler = async (
           }`
         );
       }
-      logger.warn(
+      Logger.warn(
         `Retrying operation in ${
           retryDelay / 1000
         }s (${attempt}/${maxRetries})...`

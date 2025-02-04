@@ -1,16 +1,16 @@
 import { RedisDatabase } from "../databases/redis-database";
 
-import logger from "../utils/logger";
+import Logger from "../utils/logger";
 
 export const StoreSessionLinkService = async (
   sessionId: string,
   sessionData: any,
-  ttl: number = 1800
+  ttl: number = 300
 ): Promise<void> => {
   try {
     await RedisDatabase?.setex(sessionId, ttl, JSON.stringify(sessionData));
-    logger.info(`Session stored in Redis with sessionId: ${sessionId}`);
+    Logger.info(`Session stored in Redis with sessionId: ${sessionId}`);
   } catch (error) {
-    logger.error("Error storing session in Redis:", error);
+    Logger.error("Error storing session in Redis:", error);
   }
 };

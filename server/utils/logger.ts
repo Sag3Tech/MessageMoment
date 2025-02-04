@@ -4,7 +4,7 @@ import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
 import chalk from "chalk";
 
-const logger = winston.createLogger({
+const Logger = winston.createLogger({
   level: "info",
   format: winston.format.combine(
     winston.format.colorize(),
@@ -25,4 +25,4 @@ const logger = winston.createLogger({
   ],
 });
 
-export default logger;
+export default Logger;
