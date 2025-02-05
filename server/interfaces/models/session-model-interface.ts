@@ -1,4 +1,4 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Date, Document } from "mongoose";
 import { IParticipant } from "./participant-model-interface";
 
 export interface ISession extends Document {
@@ -10,15 +10,13 @@ export interface ISession extends Document {
   region: string;
   country: string;
   coordinates: [number, number];
-  participants: mongoose.Types.ObjectId[];
-  activeUsers: mongoose.Types.ObjectId[];
+  participants: Array<{ userId: string; username: string; joinedAt: Date; isActive: boolean }>;
   isExpired: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 // For populated sessions
-export interface IPopulatedSession extends Omit<ISession, "participants" | "activeUsers"> {
+export interface IPopulatedSession extends Omit<ISession, "participants"> {
   participants: IParticipant[];
-  activeUsers: IParticipant[];
 }

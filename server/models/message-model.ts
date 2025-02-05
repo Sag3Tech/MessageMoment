@@ -5,7 +5,7 @@ import { IMessage } from "../interfaces/models/message-model-interface";
 const MessageSchema: Schema<IMessage> = new Schema(
   {
     sessionId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       ref: "Session",
       required: true,
     },

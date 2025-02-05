@@ -15,7 +15,7 @@ export const validateUniqueUsername = async (
 
     // Find the session and populate participants
     const session = await SessionModel.findOne({ sessionId: roomId }).populate({
-      path: "activeUsers",
+      path: "participants",
       select: "username",
       model: ParticipantModel,
     });
@@ -25,7 +25,7 @@ export const validateUniqueUsername = async (
     }
 
     // Check for existing username in participants
-    const usernameExists = session.activeUsers.some(
+    const usernameExists = session.participants.some(
       (participant: any) =>
         participant.username.toLowerCase() === username.toLowerCase()
     );

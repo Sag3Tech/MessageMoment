@@ -1,17 +1,15 @@
 import ParticipantModel from "../models/participant-model";
 import SessionModel from "../models/session-model";
+import AnalyticsModel from "../models/analytics-model"; // Import Analytics Model
 import { io } from "../socket";
 import { ErrorHandler } from "../utils/error-handler";
 import { IPopulatedSession } from "../interfaces/models/session-model-interface";
-import { RedisDatabase } from "../databases/redis-database"; // Add this import
+import { RedisDatabase } from "../databases/redis-database";
 
 const LeaveRoom = (socket: any) => {
-  socket.on("leaveRoom", async (roomId: string, participantId: string) => {
+  const removeParticipant = async (roomId: string, participantId: string) => {
     try {
-      // Leave the socket room first
-      socket.leave(roomId);
-
-      // Soft delete participant
+      // Remove participant from the session
       const participant = await ParticipantModel.findOneAndUpdate(
         { participantId, sessionId: roomId },
         { $set: { isActive: false } },
@@ -25,10 +23,10 @@ const LeaveRoom = (socket: any) => {
       const color = participant.assignedColor;
       await RedisDatabase?.sadd(`${roomId}:availableColors`, color);
 
-      // Update session and get fresh data
+      // Remove participant from session
       const session = await SessionModel.findOneAndUpdate(
         { sessionId: roomId },
-        { $pull: { activeUsers: participant._id } },
+        { $pull: { participants: { userId: participant.participantId } } }, // Remove participant from session
         { new: true }
       )
         .populate<IPopulatedSession>({
@@ -42,8 +40,18 @@ const LeaveRoom = (socket: any) => {
         throw new ErrorHandler("Session not found", 404);
       }
 
+      // Store participant data in Analytics collection
+      const analyticsEntry = new AnalyticsModel({
+        sessionId: roomId,
+        userId: participant.participantId,
+        username: participant.username,
+        leftAt: new Date(),
+      });
+
+      await analyticsEntry.save();
+
       // Check if all participants have left
-      if (session.activeUsers.length === 0) {
+      if (!session.participants || session.participants.length === 0) {
         // Mark session as expired in MongoDB
         await SessionModel.findOneAndUpdate(
           { sessionId: roomId },
@@ -83,12 +91,23 @@ const LeaveRoom = (socket: any) => {
         participantId: participant.participantId,
         totalParticipants: participants.length,
       });
+
     } catch (error: any) {
       console.error("Leave room error:", error);
-      socket.emit("roomError", {
-        message: error.message || "Failed to leave room",
-        code: error.statusCode || 500,
-      });
+    }
+  };
+
+  socket.on("leaveRoom", async (roomId: string, participantId: string) => {
+    await removeParticipant(roomId, participantId);
+  });
+
+  socket.on("disconnect", async () => {
+    console.log(`User disconnected: ${socket.id}`);
+    // Find the participant associated with this socket
+    const participant = await ParticipantModel.findOne({ socketId: socket.id });
+
+    if (participant) {
+      await removeParticipant(participant.sessionId, participant.participantId);
     }
   });
 };

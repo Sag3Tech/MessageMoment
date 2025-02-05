@@ -42,16 +42,13 @@ const SessionSchema: Schema<ISession> = new Schema(
     },
     participants: [
       {
-        type: Schema.Types.ObjectId,
-        ref: "Participant",
+        userId: { type: String, required: true }, 
+        username: { type: String, required: true },
+        joinedAt: { type: Date, default: Date.now },
+        isActive: { type: Boolean, default: true },
       },
     ],
-    activeUsers: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Participant",
-      },
-    ],
+
     isExpired: { type: Boolean, default: false },
   },
   { timestamps: true }

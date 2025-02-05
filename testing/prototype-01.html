@@ -100,164 +100,47 @@
         box-shadow: var(--box-shadow);
       }
 
-      .participant-list {
-        list-style: none;
-        padding: 0;
-        margin: 2rem 0;
-      }
-
-      .participant-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        margin: 0.75rem 0;
-        background: white;
-        border-radius: var(--border-radius);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        transition: var(--transition);
-      }
-
-      .participant-item:hover {
-        transform: translateX(5px);
-        box-shadow: var(--box-shadow);
-      }
-
-      .participant-info {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .participant-name {
-        font-weight: 600;
-        color: var(--text-color);
-        font-size: 1.1rem;
-      }
-
-      .participant-id {
-        font-size: 0.875rem;
-        color: #7f8c8d;
-        margin-top: 0.25rem;
-      }
-
-      .status-indicator {
-        height: 12px;
-        width: 12px;
-        border-radius: 50%;
-        background: var(--success-color);
-        margin-right: 0.5rem;
-      }
-
+      /* Chat Styles */
       .message-container {
         margin: 1.5rem 0;
         max-height: 300px;
         overflow-y: auto;
         padding-right: 0.5rem;
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: var(--border-radius);
       }
 
       .message-item {
         padding: 1rem;
         margin: 0.75rem 0;
         border-radius: var(--border-radius);
-        animation: slideIn 0.3s ease;
+        background: #eaf2fd;
+        color: #2980b9;
         font-size: 0.95rem;
       }
 
-      .message-success {
-        background: #e8f8f5;
-        color: #27ae60;
-        border-left: 4px solid #2ecc71;
-      }
-
-      .message-error {
-        background: #fdedec;
-        color: #c0392b;
-        border-left: 4px solid #e74c3c;
-      }
-
-      .message-info {
-        background: #eaf2fd;
-        color: #2980b9;
-        border-left: 4px solid #3498db;
-      }
-
-      @keyframes slideIn {
-        from {
-          transform: translateY(10px);
-          opacity: 0;
-        }
-        to {
-          transform: translateY(0);
-          opacity: 1;
-        }
-      }
-      @keyframes shake {
-        0%,
-        100% {
-          transform: translateX(0);
-        }
-        25% {
-          transform: translateX(10px);
-        }
-        50% {
-          transform: translateX(-10px);
-        }
-        75% {
-          transform: translateX(10px);
-        }
-      }
-
-      .message-error {
-        animation: shake 0.5s ease-in-out;
-      }
-
-      .session-controls {
+      .message-input {
         display: flex;
-        gap: 1rem;
-        margin-top: 2rem;
+        margin-top: 10px;
       }
 
-      /* Scrollbar Styles */
-      .message-container::-webkit-scrollbar {
-        width: 8px;
+      .message-input input {
+        flex: 1;
+        padding: 10px;
+        border-radius: var(--border-radius);
+        border: 2px solid #e0e0e0;
       }
 
-      .message-container::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
-      }
-
-      .message-container::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 10px;
-      }
-
-      .message-container::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      }
-
-      /* Responsive Design */
-      @media (max-width: 768px) {
-        .container {
-          margin: 1rem;
-          padding: 1.5rem;
-        }
-
-        .header h2 {
-          font-size: 2rem;
-        }
-
-        .btn {
-          padding: 0.8rem 1.2rem;
-          font-size: 0.9rem;
-        }
+      .message-input button {
+        margin-left: 10px;
       }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="header">
-        <h2>Chat Room Manager</h2>
+        <h2>Chat Room</h2>
       </div>
 
       <div id="joinSection">
@@ -274,181 +157,105 @@
             placeholder="Security Code (optional)"
           />
         </div>
-        <button class="btn btn-primary" onclick="joinRoom()">Join Room</button>
+        <button class="btn btn-primary" id="joinRoomBtn">Join Room</button>
       </div>
 
       <div id="roomSection" style="display: none">
+        <h3>Participants</h3>
+        <ul id="participant-list"></ul>
+
         <div class="message-container" id="messageDisplay"></div>
 
-        <h3>Participants</h3>
-        <ul id="participant-list" class="participant-list"></ul>
+        <div class="message-input">
+          <input
+            type="text"
+            id="messageInput"
+            placeholder="Type a message..."
+          />
+          <button class="btn btn-primary" id="sendMessageBtn">Send</button>
+        </div>
 
         <div class="session-controls">
-          <button class="btn btn-danger" onclick="leaveRoom()">
-            Leave Room
-          </button>
+          <button class="btn btn-danger" id="leaveRoomBtn">Leave Room</button>
         </div>
       </div>
     </div>
 
     <script src="http://localhost:8000/socket.io/socket.io.js"></script>
+
     <script>
-      const socket = io("http://localhost:8000");
-      let currentRoomId = null;
-      let currentParticipantId = null;
+      document.addEventListener("DOMContentLoaded", () => {
+        const socket = io("http://localhost:8000");
 
-      function joinRoom() {
-        const roomId = document.getElementById("roomId").value.trim();
-        const username = document.getElementById("username").value.trim();
-        const securityCode = document
-          .getElementById("securityCode")
-          .value.trim();
+        let currentRoomId = null;
+        let currentParticipantId = null;
 
-        clearMessages();
+        function joinRoom() {
+          const roomId = document.getElementById("roomId").value.trim();
+          const username = document.getElementById("username").value.trim();
+          const securityCode = document
+            .getElementById("securityCode")
+            .value.trim();
 
-        if (!roomId || !username) {
-          showError("Room ID and username are required!");
-          return;
+          if (!roomId || !username) {
+            alert("Room ID and username are required!");
+            return;
+          }
+
+          socket.emit("joinRoom", roomId, username, securityCode || undefined);
+          currentRoomId = roomId;
         }
 
-        socket.emit("joinRoom", roomId, username, securityCode || undefined);
-        currentRoomId = roomId;
-      }
+        function sendMessage() {
+          const messageInput = document.getElementById("messageInput");
+          const message = messageInput.value.trim();
 
-      function leaveRoom() {
-        if (currentRoomId && currentParticipantId) {
-          socket.emit("leaveRoom", currentRoomId, currentParticipantId);
-          document.getElementById("joinSection").style.display = "block";
-          document.getElementById("roomSection").style.display = "none";
+          if (!message || !currentRoomId || !currentParticipantId) {
+            return;
+          }
+
+          socket.emit("sendMessage", {
+            roomId: currentRoomId,
+            senderId: currentParticipantId,
+            message: message,
+          });
+
+          messageInput.value = "";
         }
-      }
 
-      function clearMessages() {
-        const messageDisplay = document.getElementById("messageDisplay");
-        messageDisplay.innerHTML = "";
-      }
+        function displayMessage(sender, message, timestamp) {
+          const messageDisplay = document.getElementById("messageDisplay");
+          const messageElement = document.createElement("div");
+          messageElement.className = "message-item";
+          messageElement.innerHTML = `<strong>${sender}:</strong> ${message} <small>${new Date(
+            timestamp
+          ).toLocaleTimeString()}</small>`;
+          messageDisplay.appendChild(messageElement);
+        }
 
-      function showError(message) {
-        const messageDisplay = document.getElementById("messageDisplay");
-        const messageElement = document.createElement("div");
-        messageElement.className = "message-item message-error";
-        messageElement.innerHTML = `<p>${message}</p>`;
-        messageDisplay.prepend(messageElement);
-      }
-
-      function updateParticipantList(participants) {
-        const listElement = document.getElementById("participant-list");
-        listElement.innerHTML = participants
-          .map(
-            (p) => `
-              <li class="participant-item">
-                <div class="participant-info">
-                  <span class="participant-name">${p.username}</span>
-                  <span class="participant-id">ID: ${p.participantId}</span>
-                </div>
-                ${
-                  p.participantId === currentParticipantId
-                    ? `<button class="btn btn-danger" onclick="leaveRoom()">Leave</button>`
-                    : `<div class="status-indicator"></div>`
-                }
-              </li>
-            `
-          )
-          .join("");
-      }
-
-      // Socket event handlers
-      socket.on("participantUpdate", (data) => {
-        updateParticipantList(data.participants);
-        document.querySelectorAll(".count-badge").forEach((el) => {
-          el.textContent = data.total;
+        socket.on("roomJoined", (data) => {
+          document.getElementById("joinSection").style.display = "none";
+          document.getElementById("roomSection").style.display = "block";
+          currentParticipantId = data.participantId;
         });
-      });
 
-      socket.on("roomJoined", (data) => {
-        document.getElementById("joinSection").style.display = "none";
-        document.getElementById("roomSection").style.display = "block";
+        socket.on("receiveMessage", (data) => {
+          displayMessage(data.senderId, data.message, data.timestamp);
+        });
 
-        const messageDisplay = document.getElementById("messageDisplay");
-        const messageElement = document.createElement("div");
-        messageElement.className = "message-item message-success";
-        messageElement.innerHTML = `
-          <p>${data.message}</p>
-          <p>Participants: <span class="count-badge">${data.participants.length}</span>/10</p>
-        `;
-        messageDisplay.prepend(messageElement);
+        socket.on("participantUpdate", (data) => {
+          const listElement = document.getElementById("participant-list");
+          listElement.innerHTML = data.participants
+            .map((p) => `<li>${p.username}</li>`)
+            .join("");
+        });
 
-        currentParticipantId = data.participantId;
-      });
-
-      socket.on("userJoined", (data) => {
-        const messageDisplay = document.getElementById("messageDisplay");
-        const messageElement = document.createElement("div");
-        messageElement.className = "message-item message-info";
-        messageElement.innerHTML = `
-          <p>${data.username} joined! 
-            <span class="count-badge">${data.totalParticipants}/10</span>
-          </p>
-        `;
-        messageDisplay.prepend(messageElement);
-      });
-
-      socket.on("userLeft", (data) => {
-        const messageDisplay = document.getElementById("messageDisplay");
-        const messageElement = document.createElement("div");
-        messageElement.className = "message-item message-info";
-        messageElement.innerHTML = `
-          <p>${data.username} left the room. 
-            <span class="count-badge">${data.totalParticipants}/10</span>
-          </p>
-        `;
-        messageDisplay.prepend(messageElement);
-      });
-
-      socket.on("sessionExpired", (data) => {
-        const messageDisplay = document.getElementById("messageDisplay");
-        const messageElement = document.createElement("div");
-        messageElement.className = "message-item message-error";
-        messageElement.innerHTML = `<p>${data.message}</p>`;
-        messageDisplay.prepend(messageElement);
-
-        document.getElementById("joinSection").style.display = "block";
-        document.getElementById("roomSection").style.display = "none";
-      });
-
-      socket.on("roomError", (error) => {
-        const messageDisplay = document.getElementById("messageDisplay");
-        const messageElement = document.createElement("div");
-        messageElement.className = "message-item message-error";
-
-        if (error.code === 409) {
-          messageElement.innerHTML = `
-        <p>Username already taken!</p>
-        <small>Please choose a different name</small>
-      `;
-
-          // Clear username field and focus
-          document.getElementById("username").value = "";
-          document.getElementById("username").focus();
-
-          // Add shake animation
-          messageElement.style.animation = "shake 0.5s ease-in-out";
-        } else {
-          messageElement.innerHTML = `<p>${error.message} (Code: ${error.code})</p>`;
-        }
-
-        messageDisplay.prepend(messageElement);
-
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
-          messageElement.remove();
-        }, 5000);
-      });
-
-      window.addEventListener("beforeunload", () => {
-        if (currentRoomId && currentParticipantId) {
-          socket.emit("leaveRoom", currentRoomId, currentParticipantId);
-        }
+        document
+          .getElementById("joinRoomBtn")
+          .addEventListener("click", joinRoom);
+        document
+          .getElementById("sendMessageBtn")
+          .addEventListener("click", sendMessage);
       });
     </script>
   </body>

@@ -1,13 +1,8 @@
 import { io } from "../socket";
-
 import { SessionTypeEnum } from "../enums/session-type-enum";
-import { IPopulatedSession } from "../interfaces/models/session-model-interface";
-
 import { RedisDatabase } from "../databases/redis-database";
-
 import SessionModel from "../models/session-model";
 import ParticipantModel from "../models/participant-model";
-
 import { getIPDetails } from "../utils/get-ip-service";
 import { ErrorHandler } from "../utils/error-handler";
 import { generateUniqueId } from "../utils/participant-id-generator";
@@ -21,26 +16,20 @@ const JoinRoom = (socket: any) => {
     "joinRoom",
     async (roomId: string, username: string, securityCode?: string) => {
       try {
-        // Validation
         if (!roomId?.trim() || !username?.trim()) {
           throw new ErrorHandler("Room ID and username are required", 400);
         }
 
-        // Redis session validation
+        // Validate session from Redis
         const sessionData = await RedisDatabase?.get(roomId);
         if (!sessionData)
           throw new ErrorHandler("Session expired or invalid", 404);
         const parsedSession = JSON.parse(sessionData);
 
-        // Check if session is expired in MongoDB
-        const existingSession = await SessionModel.findOne({
-          sessionId: roomId,
-        });
-        if (existingSession?.isExpired) {
-          throw new ErrorHandler(
-            "This session has expired and cannot be joined",
-            403
-          );
+        // Get session from MongoDB
+        let session = await SessionModel.findOne({ sessionId: roomId });
+        if (session?.isExpired) {
+          throw new ErrorHandler("This session has expired and cannot be joined", 403);
         }
 
         // Get participant's IP address
@@ -49,38 +38,25 @@ const JoinRoom = (socket: any) => {
           ? forwardedFor.split(",")[0].trim()
           : socket.request.connection.remoteAddress;
 
-        // Get geolocation data from IP
+        // Get geolocation data
         const ipDetails = await getIPDetails(ip);
+        const [latitude, longitude] = ipDetails.loc?.split(",").map(Number) || [null, null];
 
-        // Process coordinates from IP details
-        const [latitude, longitude] = ipDetails.loc?.split(",").map(Number) || [
-          null,
-          null,
-        ];
-
-        // Construct location data for participant
         const locationData = {
           city: ipDetails.city || "Unknown",
           region: ipDetails.region || "Unknown",
           country: ipDetails.country || "Unknown",
-          coordinates:
-            latitude !== null && longitude !== null
-              ? [latitude, longitude]
-              : null,
+          coordinates: latitude !== null && longitude !== null ? [latitude, longitude] : null,
         };
 
-        // Security code validation
+        // Validate security code for secure sessions
         if (parsedSession.sessionType === SessionTypeEnum.SECURE) {
-          if (
-            !securityCode ||
-            securityCode !== parsedSession.secureSecurityCode
-          ) {
+          if (!securityCode || securityCode !== parsedSession.secureSecurityCode) {
             throw new ErrorHandler("Invalid security code", 401);
           }
         }
 
-        // Find or create session with geolocation data
-        let session = await SessionModel.findOne({ sessionId: roomId });
+        // If session doesn't exist, create a new one
         if (!session) {
           session = await SessionModel.create({
             sessionId: roomId,
@@ -92,13 +68,12 @@ const JoinRoom = (socket: any) => {
             country: locationData.country,
             coordinates: locationData.coordinates,
             participants: [],
-            activeUsers: [],
-            isExpired: false, // Ensure new sessions are not expired
+            isExpired: false,
           });
         }
 
-        // Check participant limit
-        if (session.activeUsers.length >= MAX_PARTICIPANTS) {
+        // Ensure participant limit is not exceeded
+        if (session.participants.length >= MAX_PARTICIPANTS) {
           throw new ErrorHandler("Room is full (max 10 participants)", 403);
         }
 
@@ -107,7 +82,7 @@ const JoinRoom = (socket: any) => {
 
         const assignedColor = await AssignColorToParticipant(roomId);
 
-        // Create participant with their own location info
+        // ✅ Ensure the participant is saved before adding to session
         const participant = await ParticipantModel.create({
           sessionId: roomId,
           participantId: generateUniqueId(),
@@ -122,38 +97,38 @@ const JoinRoom = (socket: any) => {
           },
         });
 
-        // Update session
-        session.participants.push(participant._id);
-        session.activeUsers.push(participant._id);
+        // ✅ Ensure the participant gets added to the session correctly
+        session.participants.push({
+          userId: participant.participantId,
+          username: participant.username,
+          joinedAt: new Date(),
+          isActive: true, // Ensure this field is included in SessionModel
+        });
+
         await session.save();
 
-        // Get populated session data
-        const populatedSession = await SessionModel.findById(session._id)
-          .populate<IPopulatedSession>({
-            path: "participants",
-            select: "username participantId isActive connectionLocation",
-          })
-          .lean();
+        // ✅ Fetch the updated session WITHOUT `.populate("participants")`
+        const updatedSession = await SessionModel.findById(session._id).lean();
 
-        if (!populatedSession) {
+        if (!updatedSession) {
           throw new ErrorHandler("Failed to load session data", 500);
         }
+
+        // ✅ Format participant data
+        const participants = updatedSession.participants.map((p: any) => ({
+          username: p.username,
+          participantId: p.userId, // Ensure we are using `userId` correctly
+          location: {
+            city: p.connectionLocation?.city || "Unknown",
+            region: p.connectionLocation?.region || "Unknown",
+            country: p.connectionLocation?.country || "Unknown",
+          },
+        }));
 
         // Join socket room
         socket.join(roomId);
 
-        // Prepare response data with location information
-        const participants = populatedSession.participants.map((p) => ({
-          username: p.username,
-          participantId: p.participantId,
-          location: {
-            city: p.connectionLocation?.city,
-            region: p.connectionLocation?.region,
-            country: p.connectionLocation?.country,
-          },
-        }));
-
-        // Emit events with location data
+        // ✅ Emit room joined event (NO PAST MESSAGES)
         socket.emit("roomJoined", {
           roomId,
           username,
@@ -168,6 +143,7 @@ const JoinRoom = (socket: any) => {
           message: `${username} joined, roomId:${roomId}`,
         });
 
+        // ✅ Notify others in the room
         io.to(roomId).emit("userJoined", {
           username,
           participantId: participant.participantId,
@@ -180,7 +156,18 @@ const JoinRoom = (socket: any) => {
           totalParticipants: participants.length,
         });
 
-        io.to(roomId).emit("participantUpdate", participants);
+        io.to(roomId).emit("participantUpdate", {
+          participants,
+          total: participants.length,
+        });
+
+        // ✅ Send a system message to the new user, but DO NOT show past messages
+        socket.emit("receiveMessage", {
+          senderId: "System",
+          message: `Welcome ${username}! You have joined the chat.`,
+          timestamp: new Date(),
+        });
+
       } catch (error: any) {
         console.error("Join room error:", error);
         socket.emit("roomError", {
