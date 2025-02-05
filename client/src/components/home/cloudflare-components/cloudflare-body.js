@@ -67,6 +67,7 @@ const CloudflareBody = ({
       setOpen(false);
     }
   };
+
   useEffect(() => {
     setIsFireFoxBrowser(isFirefox);
     document.addEventListener("mousedown", handleClickOutside);
