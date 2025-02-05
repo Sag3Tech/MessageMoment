@@ -3,6 +3,8 @@
 
 /client/node_modules
 
+/client/.env
+
 # BACKEND
 /server/node_modules
 
