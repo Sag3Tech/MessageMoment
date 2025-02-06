@@ -1,5 +1,5 @@
 "use client";
-import { createRef, useEffect, useRef, useState } from "react";
+import { createRef, useCallback, useEffect, useRef, useState } from "react";
 import { chatContext } from "@/chat-context";
 import { useRouter } from "next/navigation";
 import { isFirefox } from "react-device-detect";
@@ -62,6 +62,40 @@ const Cloudflare = () => {
       type: "Standard",
     }));
   }, [isFirefox]);
+
+  const generateSessionLink = useCallback(async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:8000/api/v1/generate-session-link",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sessionType: selectedOption.toLocaleLowerCase(),
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to generate session link");
+      }
+
+      const data = await response.json();
+      const chatUrl = `https://messagemoment.com/chat/${data.data.sessionId}`;
+
+      setUrl(chatUrl);
+      setSecureCode(data.data.secureSecurityCode || "");
+      setSessionData((prev) => ({
+        ...prev,
+        code: data.data.sessionId,
+        url: chatUrl,
+        secureCode: data.data.secureSecurityCode || "",
+      }));
+    } catch (error) {
+      console.error("Error generating session link:", error);
+      alert("Failed to generate session link. Please try again.");
+    }
+  }, [selectedOption, setSessionData]);
 
   const toggleVisibility = (type) => {
     if (!isVisible) {
@@ -260,7 +294,7 @@ const Cloudflare = () => {
               IsCfVerified,
               handleCopy,
               handleDropdownVisibleChange,
-              handleRegenrateClick,
+              generateSessionLink,
               handleHover,
               handleMouseLeave,
               handleSelectUrlTYpe,
@@ -276,7 +310,7 @@ const Cloudflare = () => {
               urlType,
             }}
           />
-         
+
           <CloudflareFooter
             {...{
               IsCfVerified,
@@ -285,6 +319,7 @@ const Cloudflare = () => {
               setSecureCode,
               setUrl,
               url,
+              generateSessionLink,
             }}
           />
         </div>

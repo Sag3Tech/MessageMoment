@@ -53,7 +53,8 @@ const CloudflareBody = ({
   handleCopy,
   isVisibleTooltip,
   IsCfVerified,
-  handleRegenrateClick,
+  generateSessionLink,
+  
 }) => {
   const [IsFireFoxBrowser, setIsFireFoxBrowser] = useState(false);
   const dropdownRef = useRef();
@@ -257,8 +258,8 @@ const CloudflareBody = ({
             <button
               onMouseEnter={() => handleHover("reg")}
               onMouseLeave={() => handleMouseLeave("reg")}
-              disabled={url && IsCfVerified ? false : true}
-              onClick={url && handleRegenrateClick}
+              // disabled={url && IsCfVerified ? false : true}   NEED TO UNCOMMENT, WHEN CLOUDFLARE ISSUE RESOLVE
+              onClick={url && generateSessionLink}
               className={url ? "regen" : "regen-disable"}
             >
               <Image src={reload} alt="reload" />
