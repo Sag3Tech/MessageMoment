@@ -5,7 +5,6 @@ const CustomTurnstile = ({ setIsCfVerified}) => {
   return (
     <Turnstile
       siteKey={process.env.NEXT_PUBLIC_TURNSTILE_KEY}
-      // siteKey="0x4AAAAAAA72Ygruykfnb8YY"
       onSuccess={() => setIsCfVerified(true)}
       onError={(err) => {
         setIsCfVerified(false);

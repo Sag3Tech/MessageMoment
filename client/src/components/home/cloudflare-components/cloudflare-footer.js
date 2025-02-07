@@ -34,7 +34,7 @@ const CloudflareFooter = ({
           key={"cloudflare-custom-turnstile"}
         />
         <button
-          // disabled={IsCfVerified ? false : true}
+          disabled={IsCfVerified ? false : true}
           onClick={() => {
             if (!url) {
               generateSessionLink(); // Call the backend API to generate the session link
