@@ -182,121 +182,125 @@ const CloudflareBody =
                       open ? "ant-select-open" : "ant-select-closed"
                     } ${urlType === "Secure" ? "secure-selected" : ""}
           }`}
-                    onChange={handleSelectUrlTYpe}
-                    suffixIcon={
-                      <Image
-                        src={open ? dropDownIcon : dropdownIcon}
-                        alt="dropdown icon"
-                      />
-                    }
-                    onDropdownVisibleChange={handleDropdownVisibleChange}
-                    options={[
-                      {
-                        value: "Standard",
-                        label: (
-                          <div className="drop-down">
-                            <p>
-                              <Image
-                                style={{ color: "black" }}
-                                src={globe}
-                                alt="globe"
-                              />
-                              <span>Standard</span>
-                            </p>
-                          </div>
-                        ),
-                      },
-                      {
-                        value: "Secure",
-                        label: (
-                          <div className="drop-down drop-down2">
-                            <p>
-                              <Image src={lock} alt="globe" />
-                              <span
-                                style={{
-                                  paddingLeft: 1,
-                                }}
-                              >
-                                Secure
-                              </span>
-                            </p>
-                          </div>
-                        ),
-                      },
-                      {
-                        value: "Wallet",
-                        label: (
-                          <div className="drop-down">
-                            <p>
-                              <Image
-                                style={{ color: "black" }}
-                                src={wallet}
-                                alt="wallet"
-                              />
-                              <span>Wallet</span>
-                            </p>
-                          </div>
-                        ),
-                      },
-                    ]}
-                  />
-                </>
-              )}
-            </>
-          )}
-          <div className={`link-box ${urlType === "Secure" ? "secure" : "nonSecure"}`}>
-            <p className="url ">{url}</p>
-            {urlType == "Secure" && (
-              <p className="code">
-                <Image src={lock} alt="lock" />
-                {url && secureCode}
-              </p>
+                  onChange={handleSelectUrlTYpe}
+                  suffixIcon={
+                    <Image
+                      src={open ? dropDownIcon : dropdownIcon}
+                      alt="dropdown icon"
+                    />
+                  }
+                  onDropdownVisibleChange={handleDropdownVisibleChange}
+                  options={[
+                    {
+                      value: "Standard",
+                      label: (
+                        <div className="drop-down">
+                          <p>
+                            <Image
+                              style={{ color: "black" }}
+                              src={globe}
+                              alt="globe"
+                            />
+                            <span>Standard</span>
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      value: "Secure",
+                      label: (
+                        <div className="drop-down drop-down2">
+                          <p>
+                            <Image src={lock} alt="globe" />
+                            <span
+                              style={{
+                                paddingLeft: 1,
+                              }}
+                            >
+                              Secure
+                            </span>
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      value: "Wallet",
+                      label: (
+                        <div className="drop-down">
+                          <p>
+                            <Image
+                              style={{ color: "black" }}
+                              src={wallet}
+                              alt="wallet"
+                            />
+                            <span>Wallet</span>
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </>
             )}
-          </div>
+          </>
+        )}
+        <div
+          className={`link-box ${
+            urlType === "Secure" ? "secure" : "nonSecure"
+          }`}
+        >
+          <p className="url ">{url}</p>
+          {urlType == "Secure" && (
+            <p className="code">
+              <Image src={lock} alt="lock" />
+              {url && secureCode}
+            </p>
+          )}
         </div>
-        <div className="right">
-          <div className="btns-wrapper">
-            {/* Regenerate Tooltip */}
-            <Tooltip
-              title={<Image src={RegenerateTooltip} alt="reload" />}
-              overlayClassName="regen-tooltip"
-              open={isVisibleTooltip}
+      </div>
+      <div className="right">
+        <div className="btns-wrapper">
+          {/* Regenerate Tooltip */}
+          <Tooltip
+            title={<Image src={RegenerateTooltip} alt="reload" />}
+            overlayClassName="regen-tooltip"
+            open={isVisibleTooltip}
+          >
+            <button
+              onMouseEnter={() => handleHover("reg")}
+              onMouseLeave={() => handleMouseLeave("reg")}
+              // disabled={url && IsCfVerified ? false : true}   NEED TO UNCOMMENT, WHEN CLOUDFLARE ISSUE RESOLVE
+              onClick={url && generateSessionLink}
+              className={url ? "regen" : "regen-disable"}
             >
-              <button
-                onMouseEnter={() => handleHover("reg")}
-                onMouseLeave={() => handleMouseLeave("reg")}
-                disabled={url && IsCfVerified ? false : true}
-                onClick={url && generateSessionLink}
-                className={url ? "regen" : "regen-disable"}
-              >
-                <Image src={reload} alt="reload" />
+              <Image src={reload} alt="reload" />
+            </button>
+          </Tooltip>
+          {/* Qr Tooltip */}
+          <Tooltip
+            overlayClassName={"copy-tooltip"}
+            title={<Image src={scanQrTooltip} alt="reload" />}
+            zIndex={88}
+            onMouseEnter={() => handleHover("qr")}
+            onMouseLeave={() => handleMouseLeave("qr")}
+            open={isQrVisibleTooltip}
+          >
+            <Tooltip
+              overlayClassName={"qrcode-tooltip"}
+              title={<QrCode url={url} />}
+              trigger={"click"}
+              autoAdjustOverflow={false}
+              placement="top"
+              destroyTooltipOnHide
+              fresh
+              zIndex={89}
+              onOpenChange={(val) => onQrChange(val)}
+            >
+              <button disabled={!url} className={!url && "disable-tooltip"}>
+                <Image src={url ? qrcode : qrcodeGray} alt="qrcode" />
               </button>
             </Tooltip>
-            {/* Qr Tooltip */}
-            <Tooltip
-              overlayClassName={"copy-tooltip"}
-              title={<Image src={scanQrTooltip} alt="reload" />}
-              zIndex={88}
-              onMouseEnter={() => handleHover("qr")}
-              onMouseLeave={() => handleMouseLeave("qr")}
-              open={isQrVisibleTooltip}
-            >
-              <Tooltip
-                overlayClassName={"qrcode-tooltip"}
-                title={<QrCode url={url} />}
-                trigger={"click"}
-                autoAdjustOverflow={false}
-                placement="top"
-                destroyTooltipOnHide
-                fresh
-                zIndex={89}
-                onOpenChange={(val) => onQrChange(val)}
-              >
-                <button disabled={!url} className={!url && "disable-tooltip"}>
-                  <Image src={url ? qrcode : qrcodeGray} alt="qrcode" />
-                </button>
-              </Tooltip>
-            </Tooltip>
+          </Tooltip>
 
             {/* Copy tooltip */}
             <Tooltip
