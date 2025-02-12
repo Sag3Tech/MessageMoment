@@ -269,7 +269,7 @@ const CloudflareBody =
             <button
               onMouseEnter={() => handleHover("reg")}
               onMouseLeave={() => handleMouseLeave("reg")}
-              // disabled={url && IsCfVerified ? false : true}   NEED TO UNCOMMENT, WHEN CLOUDFLARE ISSUE RESOLVE
+              disabled={url && IsCfVerified ? false : true}
               onClick={url && generateSessionLink}
               className={url ? "regen" : "regen-disable"}
             >

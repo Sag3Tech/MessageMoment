@@ -16,7 +16,7 @@ const SideBar = () => {
         <div className="sidebar-inner">
           <div className="header">
             <h3>Chat Group</h3>
-            <p className="chat-text">{users.length}/10</p>
+            <p className="chat-text">0/10</p>
           </div>
           {/* User list */}
           <ul>
