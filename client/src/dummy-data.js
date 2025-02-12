@@ -682,7 +682,6 @@ export const handleCopyText = async (url, secureCode, urlType) => {
   });
 };
 
-
 export const options = [
   "General Query",
   "Support",
@@ -692,4 +691,17 @@ export const options = [
   "Advertising / Sponsorship Inquiries",
   "Press Inquiries",
   "Other Query",
+];
+
+export const users = [
+  "Laura",
+  "Richard",
+  "Michael",
+  "Joannah",
+  "Nina",
+  "Theresa",
+  "Aron",
+  "Catalina",
+  "Robert",
+  "Nicolas",
 ];

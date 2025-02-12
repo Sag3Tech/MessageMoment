@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import mmlogo from "@/assets/icons/chat/mm_logo.svg";
@@ -30,6 +30,7 @@ import useCheckIsMobileView from "@/hook/useCheckIsMobileView";
 import Button from "../button";
 import heartIcon from "@/assets/icons/heart_white.svg";
 import MMLogo from "@/assets/icons/chat/mmLogo";
+import { users } from "@/dummy-data";
 
 /**
  * ChatHeader renders the header section of the chat UI. It includes
@@ -37,7 +38,7 @@ import MMLogo from "@/assets/icons/chat/mmLogo";
  *
  * @returns {JSX.Element} The chat header component
  */
-export const ChatHeader = () => {
+export const ChatHeader = ({ secureCode }) => {
   const router = useRouter();
   // states
   const {
@@ -88,10 +89,7 @@ export const ChatHeader = () => {
   useEffect(() => {
     // Function to detect iOS
     const isIOS = () => {
-      return (
-        /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-        !window.MSStream
-      );
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     };
     if (isIOS()) {
       if (openMenu) {
@@ -183,6 +181,7 @@ export const ChatHeader = () => {
     );
   };
 
+  const activeUser = "Richard"; // Define active user dynamically
   return (
     <div className="header-cont">
       <div className={openMenu ? "chat-m-bar" : "bar"} />
@@ -195,7 +194,7 @@ export const ChatHeader = () => {
         <div className={"chat-m-bar"} />
         <div className="top-chat-head">
           <div className="logo">
-            <MMLogo onClick={() => window.open("/", "_blank")}/>
+            <MMLogo onClick={() => window.open("/", "_blank")} />
           </div>
           <div id={"flex-chat-row"}>
             <div className="chat-m-timerClock">
@@ -233,44 +232,25 @@ export const ChatHeader = () => {
           <div className="chat-group">
             <div className="header">
               <p className="title">Chat Group</p>
-              <p className="chat-text">10/10</p>
+              <p className="chat-text">{users.length}/10</p>
             </div>
 
             {/* User list */}
             <ul>
-              <li>
-                <p className="chat-text">[Laura]</p>
-              </li>
-              <li className="active">
-                <p className="chat-text">[Richard]</p>
-                <div>*</div>
-              </li>
-              <li>
-                <p className="chat-text">[Michael]</p>
-              </li>
-              <li>
-                <p className="chat-text">[Joannah]</p>
-              </li>
-              <li>
-                <p className="chat-text">[Nina]</p>
-              </li>
-              <li>
-                <p className="chat-text">[Theresa]</p>
-              </li>
-              <li>
-                <p className="chat-text">[Aron]</p>
-              </li>
-              <li>
-                <p className="chat-text">[Catalina]</p>
-              </li>
-              <li>
-                <p className="chat-text">[Robert]</p>
-              </li>
-              <li>
-                <p className="chat-text">[Nicolas]</p>
-              </li>
+              {users.map((user, i) => (
+                <li
+                  key={`userlist-${i.toString()}`}
+                  className={`${user === activeUser ? "active" : ""} ${
+                    users.length < 10 && i === users.length - 1
+                      ? "last-child"
+                      : ""
+                  }`}
+                >
+                  <p className="chat-text">[{user}]</p>
+                  {user === activeUser && <div>*</div>}
+                </li>
+              ))}
             </ul>
-
             {/* Advertisement section */}
             <div className="chatm_footer">
               <section className="mads">
@@ -335,7 +315,7 @@ export const ChatHeader = () => {
             <p
               className="small"
               onClick={() => {
-                handleCopy("https://messagemoment.com/chat/S2d3454");
+                handleCopy(`https://messagemoment.com/chat/${secureCode}`);
                 setShowTooltip(false);
               }}
             >

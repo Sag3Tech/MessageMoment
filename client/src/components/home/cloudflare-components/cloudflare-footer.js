@@ -1,6 +1,6 @@
 import { chatContext } from "@/chat-context";
 import CustomTurnstile from "@/components/custom-turnstile";
-import React, { useState } from "react";
+import React from "react";
 
 /**
  * CloudflareFooter component handles the rendering of the Turnstile widget and
@@ -24,8 +24,7 @@ const CloudflareFooter = ({
   router,
   generateSessionLink,
 }) => {
-  const { sessionData } = chatContext();
-
+  const { setSessionData, sessionData } = chatContext();
   return (
     <>
       <div className="gen-btn">
@@ -34,7 +33,7 @@ const CloudflareFooter = ({
           key={"cloudflare-custom-turnstile"}
         />
         <button
-          // disabled={IsCfVerified ? false : true}
+          disabled={IsCfVerified ? false : true}
           onClick={() => {
             if (!url) {
               generateSessionLink(); // Call the backend API to generate the session link
@@ -42,7 +41,7 @@ const CloudflareFooter = ({
               router.push(`/chat/${sessionData?.code}`); // Redirect to the chat page
             }
           }}
-          className={`text-blue ${(!IsCfVerified || loading) && "inactive"}`}
+          className={`text-blue ${!IsCfVerified && "inactive"}`}
         >
           {url ? "Open Chat" : "Generate Link"}
         </button>

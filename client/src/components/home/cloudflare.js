@@ -11,6 +11,8 @@ import MobileCloudFlare from "./cloudflare-components/mobile-cloudflare";
 import MobileDropdownModal from "./cloudflare-components/mobile-dropdown-modal";
 import NotificationTooltip from "./cloudflare-components/notification-tooltip";
 import { handleCopyText } from "@/dummy-data";
+import axios from "axios";
+
 export const cloudFlareRef = createRef(null);
 /**
  * Cloudflare component handles the generation and sharing of secure chat links.
@@ -55,32 +57,20 @@ const Cloudflare = () => {
   const [openQrMobileModal, setOpenQrMobileModal] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Standard");
 
-  useEffect(() => {
-    setIsWalletConnected(false);
-    setSessionData((prev) => ({
-      ...prev,
-      type: "Standard",
-    }));
-  }, [isFirefox]);
-
   const generateSessionLink = useCallback(async () => {
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/v1/generate-session-link",
+      console.log("Selected Session Type:", selectedOption.toLowerCase());
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/generate-session-link`,
         {
-          method: "POST",
+          sessionType: selectedOption.toLowerCase(),
+        },
+        {
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            sessionType: selectedOption.toLocaleLowerCase(),
-          }),
         }
       );
+      console.log("API Response:", data);
 
-      if (!response.ok) {
-        throw new Error("Failed to generate session link");
-      }
-
-      const data = await response.json();
       const chatUrl = `https://messagemoment.com/chat/${data.data.sessionId}`;
 
       setUrl(chatUrl);
@@ -96,6 +86,13 @@ const Cloudflare = () => {
       alert("Failed to generate session link. Please try again.");
     }
   }, [selectedOption, setSessionData]);
+  useEffect(() => {
+    setIsWalletConnected(false);
+    setSessionData((prev) => ({
+      ...prev,
+      type: "Standard",
+    }));
+  }, [isFirefox]);
 
   const toggleVisibility = (type) => {
     if (!isVisible) {
@@ -119,6 +116,7 @@ const Cloudflare = () => {
       ...prev,
       type: value,
     }));
+    setSelectedOption(value);
   };
 
   const handleCopy = async () => {
@@ -294,7 +292,7 @@ const Cloudflare = () => {
               IsCfVerified,
               handleCopy,
               handleDropdownVisibleChange,
-              generateSessionLink,
+              // handleRegenrateClick,
               handleHover,
               handleMouseLeave,
               handleSelectUrlTYpe,
@@ -308,6 +306,7 @@ const Cloudflare = () => {
               selectedOption,
               url,
               urlType,
+              generateSessionLink  //new one
             }}
           />
 
@@ -319,7 +318,7 @@ const Cloudflare = () => {
               setSecureCode,
               setUrl,
               url,
-              generateSessionLink,
+              generateSessionLink
             }}
           />
         </div>

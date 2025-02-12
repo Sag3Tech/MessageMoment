@@ -5,53 +5,35 @@ import Image from "next/image";
 import Link from "next/link";
 import { getYear } from "date-fns";
 import Button from "../button";
+import { users } from "@/dummy-data";
 
 const SideBar = () => {
   const currentYear = getYear(new Date());
+  const activeUser = "Richard"; // Define active user dynamically
   return (
     <div className="sidebar-container">
-      <div className="sidebar" >
+      <div className="sidebar">
         <div className="sidebar-inner">
           <div className="header">
             <h3>Chat Group</h3>
-            <p className="chat-text">10/10</p>
+            <p className="chat-text">{users.length}/10</p>
           </div>
-
           {/* User list */}
           <ul>
-            <li>
-              <p className="chat-text">[Laura]</p>
-            </li>
-            <li className="active">
-              <p className="chat-text">[Richard]</p>
-              <div>*</div>
-            </li>
-            <li>
-              <p className="chat-text">[Michael]</p>
-            </li>
-            <li>
-              <p className="chat-text">[Joannah]</p>
-            </li>
-            <li>
-              <p className="chat-text">[Nina]</p>
-            </li>
-            <li>
-              <p className="chat-text">[Theresa]</p>
-            </li>
-            <li>
-              <p className="chat-text">[Aron]</p>
-            </li>
-            <li>
-              <p className="chat-text">[Catalina]</p>
-            </li>
-            <li>
-              <p className="chat-text">[Robert]</p>
-            </li>
-            <li>
-              <p className="chat-text">[Nicolas]</p>
-            </li>
+            {/* {users.map((user, i) => (
+              <li
+                key={`userlist-${i.toString()}`}
+                className={`${user === activeUser ? "active" : ""} ${
+                  users.length>= 10 && i === users.length - 1
+                    ? "last-child"
+                    : ""
+                }`}
+              >
+                <p className="chat-text">[{user}]</p>
+                {user === activeUser && <div>*</div>}
+              </li>
+            ))} */}
           </ul>
-
           {/* Advertisement section */}
           <div className="footer">
             <section className="ads">

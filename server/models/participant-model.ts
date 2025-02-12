@@ -38,10 +38,11 @@ const ParticipantSchema: Schema<IParticipant> = new Schema(
         default: "Unknown",
       },
       coordinates: {
-        type: [Number], // [longitude, latitude]
+        type: [Number], 
         default: [0, 0],
       },
     },
+
   },
   { timestamps: true }
 );
