@@ -9,7 +9,7 @@ import qrcode from "@/assets/icons/qrcode.svg";
 import CopyTooltip from "@/assets/images/copyTooltip.svg";
 import scanQrTooltip from "@/assets/icons/scanQrTooltip.svg";
 import copyGray from "@/assets/icons/copy-grey.svg";
-import RegenerateTooltip from "@/assets/images/RegenerateTooltip.svg";
+import RegenerateTooltip from "@/assets/images/regenerateTooltip.svg";
 import copy from "@/assets/icons/copy.svg";
 import reload from "@/assets/icons/reload.svg";
 import Image from "next/image";
