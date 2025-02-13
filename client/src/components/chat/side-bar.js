@@ -16,11 +16,11 @@ const SideBar = () => {
         <div className="sidebar-inner">
           <div className="header">
             <h3>Chat Group</h3>
-            <p className="chat-text">0/10</p>
+            <p className="chat-text">{users.length}/10</p>
           </div>
           {/* User list */}
           <ul>
-            {/* {users.map((user, i) => (
+            {users.map((user, i) => (
               <li
                 key={`userlist-${i.toString()}`}
                 className={`${user === activeUser ? "active" : ""} ${
@@ -32,7 +32,7 @@ const SideBar = () => {
                 <p className="chat-text">[{user}]</p>
                 {user === activeUser && <div>*</div>}
               </li>
-            ))} */}
+            ))}
           </ul>
           {/* Advertisement section */}
           <div className="footer">

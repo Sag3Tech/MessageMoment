@@ -1,5 +1,5 @@
 "use client";
-import { createRef, useCallback, useEffect, useRef, useState } from "react";
+import { createRef, useEffect, useRef, useState } from "react";
 import { chatContext } from "@/chat-context";
 import { useRouter } from "next/navigation";
 import { isFirefox } from "react-device-detect";
@@ -11,8 +11,6 @@ import MobileCloudFlare from "./cloudflare-components/mobile-cloudflare";
 import MobileDropdownModal from "./cloudflare-components/mobile-dropdown-modal";
 import NotificationTooltip from "./cloudflare-components/notification-tooltip";
 import { handleCopyText } from "@/dummy-data";
-import axios from "axios";
-
 export const cloudFlareRef = createRef(null);
 /**
  * Cloudflare component handles the generation and sharing of secure chat links.
@@ -57,35 +55,6 @@ const Cloudflare = () => {
   const [openQrMobileModal, setOpenQrMobileModal] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Standard");
 
-  const generateSessionLink = useCallback(async () => {
-    try {
-      console.log("Selected Session Type:", selectedOption.toLowerCase());
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/generate-session-link`,
-        {
-          sessionType: selectedOption.toLowerCase(),
-        },
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-      console.log("API Response:", data);
-
-      const chatUrl = `https://messagemoment.com/chat/${data.data.sessionId}`;
-
-      setUrl(chatUrl);
-      setSecureCode(data.data.secureSecurityCode || "");
-      setSessionData((prev) => ({
-        ...prev,
-        code: data.data.sessionId,
-        url: chatUrl,
-        secureCode: data.data.secureSecurityCode || "",
-      }));
-    } catch (error) {
-      console.error("Error generating session link:", error);
-      alert("Failed to generate session link. Please try again.");
-    }
-  }, [selectedOption, setSessionData]);
   useEffect(() => {
     setIsWalletConnected(false);
     setSessionData((prev) => ({
@@ -116,7 +85,6 @@ const Cloudflare = () => {
       ...prev,
       type: value,
     }));
-    setSelectedOption(value);
   };
 
   const handleCopy = async () => {
@@ -292,7 +260,7 @@ const Cloudflare = () => {
               IsCfVerified,
               handleCopy,
               handleDropdownVisibleChange,
-              // handleRegenrateClick,
+              handleRegenrateClick,
               handleHover,
               handleMouseLeave,
               handleSelectUrlTYpe,
@@ -306,10 +274,9 @@ const Cloudflare = () => {
               selectedOption,
               url,
               urlType,
-              generateSessionLink  //new one
             }}
           />
-
+         
           <CloudflareFooter
             {...{
               IsCfVerified,
@@ -318,7 +285,6 @@ const Cloudflare = () => {
               setSecureCode,
               setUrl,
               url,
-              generateSessionLink
             }}
           />
         </div>

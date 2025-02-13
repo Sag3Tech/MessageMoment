@@ -22,23 +22,26 @@ const CloudflareFooter = ({
   setSecureCode,
   IsCfVerified,
   router,
-  generateSessionLink,
 }) => {
   const { setSessionData, sessionData } = chatContext();
   return (
     <>
       <div className="gen-btn">
-        <CustomTurnstile
-          setIsCfVerified={setIsCfVerified}
-          key={"cloudflare-custom-turnstile"}
-        />
+        <CustomTurnstile setIsCfVerified={setIsCfVerified} key={'cloudflare-custom-turnstile'} />
         <button
           disabled={IsCfVerified ? false : true}
           onClick={() => {
             if (!url) {
-              generateSessionLink(); // Call the backend API to generate the session link
+              setUrl("https://messagemoment.com/chat/sqjgcf9o2s5na");
+              setSecureCode("4562");
+              setSessionData((prev) => ({
+                ...prev,
+                code: "sqjgcf9o2s5na",
+                url: "https://messagemoment.com/chat/sqjgcf9o2s5na",
+                secureCode: "4562",
+              }));
             } else {
-              router.push(`/chat/${sessionData?.code}`); // Redirect to the chat page
+              router.push(`/chat/${sessionData?.code}`);
             }
           }}
           className={`text-blue ${!IsCfVerified && "inactive"}`}

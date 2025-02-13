@@ -38,7 +38,7 @@ import { users } from "@/dummy-data";
  *
  * @returns {JSX.Element} The chat header component
  */
-export const ChatHeader = ({ secureCode }) => {
+export const ChatHeader = () => {
   const router = useRouter();
   // states
   const {
@@ -241,7 +241,7 @@ export const ChatHeader = ({ secureCode }) => {
                 <li
                   key={`userlist-${i.toString()}`}
                   className={`${user === activeUser ? "active" : ""} ${
-                    users.length < 10 && i === users.length - 1
+                    users.length <10 && i === users.length - 1
                       ? "last-child"
                       : ""
                   }`}
@@ -315,7 +315,7 @@ export const ChatHeader = ({ secureCode }) => {
             <p
               className="small"
               onClick={() => {
-                handleCopy(`https://messagemoment.com/chat/${secureCode}`);
+                handleCopy("https://messagemoment.com/chat/S2d3454");
                 setShowTooltip(false);
               }}
             >
