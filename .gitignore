@@ -1,13 +1,9 @@
 # FRONTEND
 /client/.next/
-
 /client/node_modules
-
 /client/.env
 
 # BACKEND
 /server/node_modules
-
 /server/logs
-
-/server/.env.production
+/server/.env

@@ -1,4 +1,4 @@
-import "dotenv-flow/config";
+import "dotenv/config";
 
 import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";

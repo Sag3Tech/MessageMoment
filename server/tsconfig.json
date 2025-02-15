@@ -1,19 +1,19 @@
 {
   "compilerOptions": {
-    /* LANGUAGE & ENVOIRMENT */
-    "target": "es2016",
-
-    /* MODULES */
-    "module": "commonjs",
-
-    /* INTEROP & CONSTRAINTS */
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-
-    /* TYPE CHECKING */
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "dist",
+    "rootDir": "./",
     "strict": true,
-
-    /* COMPLETENESS */
-    "skipLibCheck": true
-  }
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "*": ["./*"]
+    }
+  },
+  "include": ["."],
+  "exclude": ["node_modules", "dist"]
 }

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 
-import { ErrorHandler } from "../../utils/error-handler";
+import { ErrorHandler } from "../../utils/error-handler.js";
 
 export const DefaultError = (
   err: any,

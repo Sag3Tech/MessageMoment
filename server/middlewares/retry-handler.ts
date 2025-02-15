@@ -1,4 +1,4 @@
-import { RetryOptions } from "../interfaces/middlewares-interfaces";
+import { RetryOptions } from "../interfaces/middlewares-interfaces.js";
 
 import Logger from "../utils/logger.js";
 
