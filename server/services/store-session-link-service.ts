@@ -1,6 +1,6 @@
 import { RedisDatabase } from "../databases/redis-database";
 
-import Logger from "../utils/logger";
+import Logger from "../utils/logger.mjs";
 
 export const StoreSessionLinkService = async (
   sessionId: string,

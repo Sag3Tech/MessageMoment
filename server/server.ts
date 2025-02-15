@@ -12,7 +12,7 @@ import { HandleException } from "./middlewares/exception-handler";
 import { HandleRejection } from "./middlewares/rejection-handler";
 import { GracefullyShutdown } from "./middlewares/gracefully-shutdown";
 
-import Logger from "./utils/logger";
+import Logger from "./utils/logger.mjs";
 
 HandleException();
 

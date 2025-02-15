@@ -1,6 +1,6 @@
 import { Server } from "http";
 
-import Logger from "../utils/logger";
+import Logger from "../utils/logger.mjs";
 
 export const HandleRejection = (server: Server): void => {
   process.on("unhandledRejection", (reason: any) => {
