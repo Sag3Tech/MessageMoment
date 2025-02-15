@@ -14,7 +14,6 @@
     "strict": true,
 
     /* COMPLETENESS */
-    "skipLibCheck": true,
-    
+    "skipLibCheck": true
   }
 }
