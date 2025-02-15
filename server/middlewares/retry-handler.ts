@@ -1,6 +1,6 @@
 import { RetryOptions } from "../interfaces/middlewares-interfaces";
 
-import Logger from "../utils/logger.mjs";
+import Logger from "../utils/logger.js";
 
 export const RetryHandler = async (
   operation: () => Promise<void>,

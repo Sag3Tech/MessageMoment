@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 
 import { RetryHandler } from "../middlewares/retry-handler";
 
-import Logger from "../utils/logger.mjs";
+import Logger from "../utils/logger.js";
 
 // MONGOOSE DATABASE CONNECTION
 const MongooseDatabaseOperation = async (): Promise<void> => {

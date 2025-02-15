@@ -1,4 +1,4 @@
-import Logger from "../utils/logger.mjs";
+import Logger from "../utils/logger.js";
 
 export const HandleException = (): void => {
   process.on("uncaughtException", (err: Error) => {

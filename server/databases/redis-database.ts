@@ -4,7 +4,7 @@ import Redis from "ioredis";
 
 import { RetryHandler } from "../middlewares/retry-handler";
 
-import Logger from "../utils/logger.mjs";
+import Logger from "../utils/logger.js";
 
 let RedisDatabase: Redis | null = null;
 

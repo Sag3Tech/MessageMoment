@@ -3,7 +3,7 @@ import { IPGeoData } from "../interfaces/ip-interface";
 import axios from "axios";
 import rateLimit from "axios-rate-limit";
 
-import Logger from "./logger.mjs";
+import Logger from "./logger.js";
 
 // Configure rate-limited axios instance (50 requests/minute)
 const ipinfoHttp = rateLimit(axios.create(), {

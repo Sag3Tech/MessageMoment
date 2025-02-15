@@ -1,6 +1,6 @@
 import { RedisDatabase } from "../databases/redis-database";
 
-import Logger from "../utils/logger.mjs";
+import Logger from "../utils/logger.js";
 
 export const DeleteSessionLinkService = async (
   sessionId: string
