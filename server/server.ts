@@ -22,7 +22,8 @@ const PORT = process.env.PORT || 3000; // Production
 
 const StartServer = async (): Promise<void> => {
   try {
-    server.listen(process.env.PORT, () => {
+    // server.listen(process.env.PORT, () => { -- Development
+    server.listen(PORT, () => { // Production
       // console.info(`Server is running on port: ${process.env.PORT}`); -- Development
       console.info(`Server is running on port: ${PORT}`); // Production
     });
