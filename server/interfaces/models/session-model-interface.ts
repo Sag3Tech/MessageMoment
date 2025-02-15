@@ -1,4 +1,4 @@
-import mongoose, { Date, Document } from "mongoose";
+import { Document } from "mongoose";
 import { IParticipant } from "./participant-model-interface";
 
 export interface ISession extends Document {
@@ -10,7 +10,12 @@ export interface ISession extends Document {
   region: string;
   country: string;
   coordinates: [number, number];
-  participants: Array<{ userId: string; username: string; joinedAt: Date; isActive: boolean }>;
+  participants: Array<{
+    userId: string;
+    username: string;
+    joinedAt: Date;
+    isActive: boolean;
+  }>;
   isExpired: boolean;
   createdAt?: Date;
   updatedAt?: Date;

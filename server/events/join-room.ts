@@ -101,8 +101,8 @@ const JoinRoom = (socket: any) => {
         session.participants.push({
           userId: participant.participantId,
           username: participant.username,
-          joinedAt: new Date(),
-          isActive: true, // Ensure this field is included in SessionModel
+          joinedAt: new Date() as Date,
+          isActive: true,
         });
 
         await session.save();
