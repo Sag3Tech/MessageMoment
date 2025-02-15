@@ -18,11 +18,13 @@ HandleException();
 
 const server = createServer(app);
 InitializeSocket(server);
+const PORT = process.env.PORT || 3000; // Production
 
 const StartServer = async (): Promise<void> => {
   try {
     server.listen(process.env.PORT, () => {
-      console.info(`Server is running on port: ${process.env.PORT}`);
+      // console.info(`Server is running on port: ${process.env.PORT}`); -- Development
+      console.info(`Server is running on port: ${PORT}`); // Production
     });
 
     await ConnectMongooseDatabase();
