@@ -3,16 +3,20 @@ import { io } from "../socket.js";
 import { SubscribeToRedisChannel } from "../databases/redis-database.js";
 
 const MessageReceived = () => {
-  SubscribeToRedisChannel("message", (message: string) => {
-    try {
-      const data = JSON.parse(message);
-      io.to(data.roomId).emit("receiveMessage", {
-        senderId: data.senderId,
-        message: data.message,
-      });
-    } catch (error) {
-      console.error("Error processing received message:", error);
-    }
+  SubscribeToRedisChannel("chatRoom:*", (message: string) => {
+    const parsedMessage = JSON.parse(message);
+
+    const { sender, message: msg, timestamp } = parsedMessage;
+
+    io.to(`chatRoom:${parsedMessage.sessionId}`).emit("receiveMessage", {
+      sender,
+      message: msg,
+      timestamp,
+    });
+
+    console.info(
+      `Message from ${sender} sent to clients in chatRoom:${parsedMessage.sessionId}`
+    );
   });
 };
 

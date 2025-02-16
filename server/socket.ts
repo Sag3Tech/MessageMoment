@@ -6,7 +6,6 @@ import { Disconnect } from "./events/disconnect.js";
 import { MessageReceived } from "./events/message-received.js";
 import { LeaveRoom } from "./events/leave-room.js";
 import { ErrorHandler } from "./events/error-handler.js";
-import { GetParticipantCount } from "./events/get-participant-count.js";
 
 let io: SocketServer;
 
@@ -26,7 +25,6 @@ const InitializeSocket = (server: any) => {
     Disconnect(socket);
     LeaveRoom(socket);
     ErrorHandler(socket);
-    GetParticipantCount(socket);
   });
 
   MessageReceived();
