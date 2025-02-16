@@ -6,6 +6,7 @@ import cors from "cors";
 import { AppErrorHandler } from "./middlewares/app-error-handler.js";
 
 import BasicRouter from "./routes/basic-routes.js";
+import SessionRouter from "routes/session-link-routes.js";
 
 export const app = express();
 
@@ -18,6 +19,9 @@ app.use(
     credentials: true,
   })
 );
+
+// API ROUTES
+app.use("/api/v1", SessionRouter);
 
 // BASIC ROUTES
 app.use("", BasicRouter);
