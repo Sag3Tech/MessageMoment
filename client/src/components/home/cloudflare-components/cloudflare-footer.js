@@ -2,6 +2,7 @@ import { chatContext } from "@/chat-context";
 import CustomTurnstile from "@/components/custom-turnstile";
 import { ApiRequest } from "@/utils/api-request";
 import React from "react";
+import { Spin } from "antd";
 
 /**
  * CloudflareFooter component handles the rendering of the Turnstile widget and
@@ -25,9 +26,11 @@ const CloudflareFooter = ({
   router,
 }) => {
   const { setSessionData, sessionData } = chatContext();
+  const [loading, setLoading] = useState(false);
 
   const handleGenerateClick = async () => {
     try {
+      setLoading(true);
       const response = await ApiRequest("/generate-session-link", "POST", {
         sessionType: sessionData.type.toLowerCase(),
       });
@@ -47,6 +50,8 @@ const CloudflareFooter = ({
       }
     } catch (error) {
       console.error("Error generating session link:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,7 +63,7 @@ const CloudflareFooter = ({
           key={"cloudflare-custom-turnstile"}
         />
         <button
-          disabled={IsCfVerified ? false : true}
+          disabled={!IsCfVerified || loading}
           onClick={() => {
             if (!url) {
               handleGenerateClick();
@@ -66,9 +71,17 @@ const CloudflareFooter = ({
               router.push(`/chat/${sessionData?.code}`);
             }
           }}
-          className={`text-blue ${!IsCfVerified && "inactive"}`}
+          className={`text-blue ${!IsCfVerified && "inactive"} ${
+            loading ? "loading" : ""
+          }`}
         >
-          {url ? "Open Chat" : "Generate Link"}
+          {loading ? (
+            <Spin size="small" />
+          ) : url ? (
+            "Open Chat"
+          ) : (
+            "Generate Link"
+          )}
         </button>
       </div>
       <p className="note text-white text-center">

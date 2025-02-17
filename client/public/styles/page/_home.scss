@@ -1612,3 +1612,10 @@ section.slider {
     height: 920px;
   }
 }
+
+// integration
+.gen-btn button.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
