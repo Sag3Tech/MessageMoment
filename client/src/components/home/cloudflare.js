@@ -11,6 +11,7 @@ import MobileCloudFlare from "./cloudflare-components/mobile-cloudflare";
 import MobileDropdownModal from "./cloudflare-components/mobile-dropdown-modal";
 import NotificationTooltip from "./cloudflare-components/notification-tooltip";
 import { handleCopyText } from "@/dummy-data";
+import { ApiRequest } from "@/utils/api-request";
 export const cloudFlareRef = createRef(null);
 /**
  * Cloudflare component handles the generation and sharing of secure chat links.
@@ -38,6 +39,7 @@ const Cloudflare = () => {
     setIsWalletConnected,
     setdropdownSelected,
   } = chatContext();
+
   // stats
   const [loading, setLoading] = useState(true);
   const [url, setUrl] = useState("");
@@ -95,42 +97,41 @@ const Cloudflare = () => {
     }
   };
 
-  const generateRandomString = (length) => {
-    const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
-    let result = "";
-    for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * characters.length);
-      result += characters[randomIndex];
-    }
-    setSessionData((prev) => ({
-      ...prev,
-      code: result,
-      url: `https://messagemoment.com/chat/${result}`,
-    }));
-    return result;
-  };
-
-  function generateRandomNumber() {
-    const result = Math.floor(1000 + Math.random() * 9000);
-    setSessionData((prev) => ({
-      ...prev,
-      secureCode: result,
-    }));
-    return result;
-  }
-
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
     }, 1500);
   }, []);
 
-  const handleRegenrateClick = () => {
-    setIsVisibleTooltip(false);
-    setUrl(`https://messagemoment.com/chat/${generateRandomString(12)}`);
-    setSecureCode(generateRandomNumber());
-    setNotificationType("reg");
-    toggleVisibility("reg");
+  const handleRegenrateClick = async () => {
+    try {
+      setIsVisibleTooltip(false);
+      setLoading(true);
+
+      const response = await ApiRequest("/generate-session-link", "POST", {
+        sessionType: sessionData.type.toLowerCase(),
+      });
+
+      if (response?.data?.sessionId) {
+        const generatedUrl = `https://messagemoment.com/chat/${response.data.sessionId}`;
+
+        setSessionData((prev) => ({
+          ...prev,
+          code: response.data.sessionId,
+          url: generatedUrl,
+          secureCode: response.data.secureSecurityCode || "",
+        }));
+
+        setUrl(generatedUrl);
+        setSecureCode(response.data.secureSecurityCode || "");
+        setNotificationType("reg");
+        toggleVisibility("reg");
+      }
+    } catch (error) {
+      console.error("Error regenerating session link:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleHover = (type = "reg") => {
@@ -156,6 +157,7 @@ const Cloudflare = () => {
       }
     }
   };
+
   const onQrChange = (val) => {
     if (val) {
       setQrIsVisibleTooltip(false);
@@ -196,6 +198,7 @@ const Cloudflare = () => {
       setOpenQrMobileModal(false);
     }
   };
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -276,7 +279,7 @@ const Cloudflare = () => {
               urlType,
             }}
           />
-         
+
           <CloudflareFooter
             {...{
               IsCfVerified,

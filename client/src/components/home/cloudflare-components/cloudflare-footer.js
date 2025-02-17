@@ -1,5 +1,6 @@
 import { chatContext } from "@/chat-context";
 import CustomTurnstile from "@/components/custom-turnstile";
+import { ApiRequest } from "@/utils/api-request";
 import React from "react";
 
 /**
@@ -24,22 +25,43 @@ const CloudflareFooter = ({
   router,
 }) => {
   const { setSessionData, sessionData } = chatContext();
+
+  const handleGenerateClick = async () => {
+    try {
+      const response = await ApiRequest("/generate-session-link", "POST", {
+        sessionType: sessionData.type.toLowerCase(),
+      });
+
+      if (response?.data?.sessionId) {
+        const generatedUrl = `https://messagemoment.com/chat/${response.data.sessionId}`;
+
+        setSessionData((prev) => ({
+          ...prev,
+          code: response.data.sessionId,
+          url: generatedUrl,
+          secureCode: response.data.secureSecurityCode || "",
+        }));
+
+        setUrl(generatedUrl);
+        setSecureCode(response.data.secureSecurityCode || "");
+      }
+    } catch (error) {
+      console.error("Error generating session link:", error);
+    }
+  };
+
   return (
     <>
       <div className="gen-btn">
-        <CustomTurnstile setIsCfVerified={setIsCfVerified} key={'cloudflare-custom-turnstile'} />
+        <CustomTurnstile
+          setIsCfVerified={setIsCfVerified}
+          key={"cloudflare-custom-turnstile"}
+        />
         <button
           disabled={IsCfVerified ? false : true}
           onClick={() => {
             if (!url) {
-              setUrl("https://messagemoment.com/chat/sqjgcf9o2s5na");
-              setSecureCode("4562");
-              setSessionData((prev) => ({
-                ...prev,
-                code: "sqjgcf9o2s5na",
-                url: "https://messagemoment.com/chat/sqjgcf9o2s5na",
-                secureCode: "4562",
-              }));
+              handleGenerateClick();
             } else {
               router.push(`/chat/${sessionData?.code}`);
             }

@@ -16,9 +16,9 @@ const ChatContextProvider = ({ children }) => {
   // home page
   const [sessionData, setSessionData] = useState({
     type: "Standard",
-    url: "",
     code: "",
-    secureCode: "4562",
+    url: "",
+    secureCode: "",
   });
 
   // expiry chat time
@@ -45,7 +45,6 @@ const ChatContextProvider = ({ children }) => {
 
   // Wallet Exist or not
   const [isWalletExist, setIsWalletExist] = useState(true);
-
 
   // dropdown selected
   const [dropdownSelected, setdropdownSelected] = useState("Standard");
@@ -82,7 +81,7 @@ const ChatContextProvider = ({ children }) => {
     isWalletExist,
     setIsWalletExist,
     setdropdownSelected,
-    dropdownSelected
+    dropdownSelected,
   };
 
   return <ChatContext.Provider value={data}>{children}</ChatContext.Provider>;
