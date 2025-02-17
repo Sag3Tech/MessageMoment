@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React, { useEffect, useState } from "react";
 import Button from "../button";
 import Cookie from "../../assets/icons/cookie.svg";
@@ -26,6 +26,7 @@ import Cookies from "js-cookie";
 const ScreenModalCookie = ({ isVisible, isClosing, onPress }) => {
   const [ischeck, setIshcek] = useState(false);
   const [isperfomancecheck, setperfomanceIshcek] = useState(false);
+  
   const text = `
   These cookies are essential for the proper functioning of this website. Without these cookies, the website would not work properly.
 `;
@@ -70,9 +71,10 @@ const ScreenModalCookie = ({ isVisible, isClosing, onPress }) => {
       </div>
     </div>
   );
+
   const label3 = (
     <div className="panel-header">
-       Advertisement and Targeting cookies
+      Advertisement and Targeting cookies
       <div
         className={`custom-switch ${isperfomancecheck ? "checked" : ""}`}
         onClick={(e) => {
@@ -171,22 +173,27 @@ const ScreenModalCookie = ({ isVisible, isClosing, onPress }) => {
   ];
 
   const setCookie = () => {
-    // Cookies.set("cookiesAccepted", "true");
-    // console.log("cookie click");
-    Cookies.set("cookiesAccepted", true, {
-      domain: "message-moment-app.vercel.app",
+    Cookies.set("cookiesAccepted", "true", {
+      expires: 365,
       secure: true,
       sameSite: "Lax",
+      domain: process.env.NEXT_PUBLIC_FRONTEND_URL,
     });
   };
+
   return (
     <div className={`cookie-modal ${isVisible ? "open-fade" : ""}`}>
       <div className={`cookie-modal-wrapper ${isClosing ? "fade-out" : ""}`}>
         {/* header */}
         <div className="header">
-          <Image src={Cookie} className="cooki-img" alt="Cookie"/>
+          <Image src={Cookie} className="cooki-img" alt="Cookie" />
           <h4>Cookie Preferences</h4>
-          <Image src={CrossDark} onClick={onPress} className="dark-cross" alt="CrossDark" />
+          <Image
+            src={CrossDark}
+            onClick={onPress}
+            className="dark-cross"
+            alt="CrossDark"
+          />
         </div>
         {/* body */}
         <div className="cookie-body">
@@ -196,8 +203,10 @@ const ScreenModalCookie = ({ isVisible, isClosing, onPress }) => {
             and to enhance your online experience. You can choose for each
             category to opt-in/out whenever you want. For more details relative
             to cookies and other sensitive data, please read the full{" "}
-            <span className="underline-link" >
-              <a href="/privacy" target="_blank">Privacy Policy</a>
+            <span className="underline-link">
+              <a href="/privacy" target="_blank">
+                Privacy Policy
+              </a>
             </span>
             .
           </p>
@@ -268,26 +277,12 @@ const ScreenModalCookie = ({ isVisible, isClosing, onPress }) => {
   );
 };
 
-
-
-/**
- * A side cookie modal that will appear if the user hasn't accepted the cookie usage yet.
- * The modal will appear on the right side of the screen and will have a blurred background.
- * The modal will have a "Accept All" button and a "Reject All" button.
- * The user can close the modal by clicking the "x" button on the top right of the modal.
- * The user can also close the modal by clicking outside the modal.
- * The modal will not appear if the user has already accepted the cookie usage.
- * @returns {React.ReactElement} The side cookie modal component.
- */
-
 export default function SideCookieModal() {
   const [isVisible, setIsVisible] = useState(false);
   const [cookieModal, setCookieModal] = useState(false);
   const [isClosing, setisClosing] = useState(false);
   const [hasShown, setHasShown] = useState(false);
 
-  const cookiesAccepted = Cookies.get("cookiesAccepted");
-  
   const closedModal = () => {
     setisClosing(true);
     setTimeout(() => {
@@ -296,38 +291,37 @@ export default function SideCookieModal() {
   };
 
   useEffect(() => {
-    if (cookiesAccepted) {
+    const cookiesAccepted = Cookies.get("cookiesAccepted");
+
+    if (cookiesAccepted === "true") {
       setIsVisible(false);
       setHasShown(false);
     } else {
       setIsVisible(true);
       setHasShown(true);
     }
-  }, [cookiesAccepted]);
+  }, []);
 
   const setCookie = () => {
-    // Cookies.set("cookiesAccepted", "true");
-    // console.log("cookie click");
-
-    Cookies.set("cookiesAccepted", true, {
-      domain: "message-moment-app.vercel.app",
+    Cookies.set("cookiesAccepted", "true", {
+      expires: 365,
       secure: true,
       sameSite: "Lax",
+      domain: process.env.NEXT_PUBLIC_FRONTEND_URL,
     });
   };
 
   useEffect(() => {
     if (cookieModal) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto";
     }
-    // Cleanup on unmount
     return () => {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto";
     };
   }, [cookieModal]);
-  
+
   return (
     <>
       <ScreenModalCookie
@@ -336,14 +330,14 @@ export default function SideCookieModal() {
         onPress={closedModal}
       />
       <div className={`${isVisible ? "bg-wrapper" : "bg-wrappper-hide"}`}>
-        {isVisible && <Image src={Blur} className="cookie-blur" alt="Blur"/>}
+        {isVisible && <Image src={Blur} className="cookie-blur" alt="Blur" />}
       </div>
       <div
         className={`cookie-wrapper ${
           isVisible ? "show" : hasShown ? "hide" : ""
         } `}
       >
-        <Image src={Cookie} className="cookie" alt="Cookie"/>
+        <Image src={Cookie} className="cookie" alt="Cookie" />
         <Image
           src={Cross}
           onClick={() => setIsVisible(false)}
