@@ -3,6 +3,7 @@ import CustomTurnstile from "@/components/custom-turnstile";
 import { ApiRequest } from "@/utils/api-request";
 import React, { useState } from "react";
 import { Spin } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 
 /**
  * CloudflareFooter component handles the rendering of the Turnstile widget and
@@ -76,7 +77,7 @@ const CloudflareFooter = ({
           }`}
         >
           {loading ? (
-            <Spin size="small" />
+            <Spin indicator={<LoadingOutlined spin />} size="small" />
           ) : url ? (
             "Open Chat"
           ) : (
