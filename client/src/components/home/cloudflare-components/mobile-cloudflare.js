@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React, { forwardRef } from "react";
+import React, { forwardRef, useState } from "react";
 import globe from "@/assets/icons/globe.svg";
 import lock from "@/assets/icons/secure.svg";
 import wallet from "@/assets/icons/wallet.svg";
@@ -13,6 +13,8 @@ import copy from "@/assets/icons/copy.svg";
 import { chatContext } from "@/chat-context";
 import CustomTurnstile from "@/components/custom-turnstile";
 import { ApiRequest } from "@/utils/api-request";
+import { Spin } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 
 const MobileCloudFlare = forwardRef(
   (
@@ -35,9 +37,11 @@ const MobileCloudFlare = forwardRef(
     ref
   ) => {
     const { setSessionData, sessionData } = chatContext();
+    const [loading, setLoading] = useState(false);
 
     const handleGenerateClick = async () => {
       try {
+        setLoading(true);
         const response = await ApiRequest("/generate-session-link", "POST", {
           sessionType: sessionData.type.toLowerCase(),
         });
@@ -57,6 +61,8 @@ const MobileCloudFlare = forwardRef(
         }
       } catch (error) {
         console.error("Error generating session link:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -141,7 +147,7 @@ const MobileCloudFlare = forwardRef(
           </div>
           <div className="gen-btn">
             <button
-              disabled={IsCfVerified ? false : true}
+              disabled={!IsCfVerified || loading}
               onClick={() => {
                 if (!url) {
                   handleGenerateClick();
@@ -149,9 +155,17 @@ const MobileCloudFlare = forwardRef(
                   router.push(`/chat/${sessionData?.code}`);
                 }
               }}
-              className={`text-blue ${!IsCfVerified && "inactive"}`}
+              className={`text-blue ${!IsCfVerified && "inactive"} ${
+                loading ? "loading" : ""
+              }`}
             >
-              {url ? "Open Chat" : "Generate Link"}
+              {loading ? (
+                <Spin indicator={<LoadingOutlined spin />} />
+              ) : url ? (
+                "Open Chat"
+              ) : (
+                "Generate Link"
+              )}
             </button>
           </div>
         </div>

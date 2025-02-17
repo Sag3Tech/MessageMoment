@@ -77,7 +77,7 @@ const CloudflareFooter = ({
           }`}
         >
           {loading ? (
-            <Spin indicator={<LoadingOutlined spin />} size="small" />
+            <Spin indicator={<LoadingOutlined spin />} />
           ) : url ? (
             "Open Chat"
           ) : (
