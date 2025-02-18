@@ -20,7 +20,7 @@ export const GenerateSessionLinkFunction = CatchAsyncErrors(
 
       const sessionId = SessionIdGenerator();
       
-      const secureSecurityCode =
+      const sessionSecurityCode =
         sessionType === SessionTypeEnum.SECURE
           ? SecurityCodeGenerator()
           : undefined;
@@ -33,7 +33,7 @@ export const GenerateSessionLinkFunction = CatchAsyncErrors(
       const sessionData = {
         sessionId,
         sessionType,
-        secureSecurityCode,
+        sessionSecurityCode,
         sessionIp,
       };
 
@@ -44,7 +44,7 @@ export const GenerateSessionLinkFunction = CatchAsyncErrors(
         data: {
           sessionId,
           sessionType,
-          secureSecurityCode,
+          sessionSecurityCode,
           sessionIp,
         },
       });

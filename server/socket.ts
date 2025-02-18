@@ -20,7 +20,7 @@ const InitializeSocket = (server: any) => {
   io.on("connection", (socket) => {
     console.info(`New socket connection: ${socket.id}`);
 
-    JoinRoom(socket);
+    JoinRoom(io, socket);
     SendMessage(socket);
     Disconnect(socket);
     LeaveRoom(socket);

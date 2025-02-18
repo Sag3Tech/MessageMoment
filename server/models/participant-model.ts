@@ -2,47 +2,44 @@ import mongoose, { Schema } from "mongoose";
 
 import { IParticipant } from "../interfaces/models/participant-model-interface.js";
 
-const ParticipantSchema: Schema<IParticipant> = new Schema(
+import { ParticipantIdGenerator } from "../utils/participant-id-generator.js";
+
+const ParticipantSchema: Schema = new Schema(
   {
     sessionId: {
-      type: String,
-      required: true,
+      type: Schema.Types.ObjectId,
+      ref: "Session",
     },
-    assignedColor: { type: String, required: true },
-    participantId: {
+    userId: {
       type: String,
-      required: true,
+      default: () => ParticipantIdGenerator(),
+      unique: true,
     },
     username: {
       type: String,
       required: true,
     },
-    isActive: {
-      type: Boolean,
-      default: true,
+    participantIp: {
+      type: String,
     },
-    joinedAt: {
-      type: Date,
-      default: Date.now,
-    },
-    connectionLocation: {
+    participantLocation: {
+      longitude: {
+        type: Number,
+      },
+      latitude: {
+        type: Number,
+      },
       city: {
         type: String,
-        default: "Unknown",
-      },
-      region: {
-        type: String,
-        default: "Unknown",
       },
       country: {
         type: String,
-        default: "Unknown",
-      },
-      coordinates: {
-        type: [Number],
-        default: [0, 0],
       },
     },
+    assignedColor: {
+      type: String,
+    },
+    hasLockedSession: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

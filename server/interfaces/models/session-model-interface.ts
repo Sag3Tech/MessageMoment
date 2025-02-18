@@ -1,27 +1,30 @@
 import { Document } from "mongoose";
 
-import { IParticipant } from "./participant-model-interface.js";
+import { SessionTypeEnum } from "../../enums/session-type-enum.js";
 
 export interface ISession extends Document {
   sessionId: string;
-  sessionType: string;
-  secureSecurityCode?: string;
+  sessionType: SessionTypeEnum;
+  sessionSecurityCode?: string;
   sessionIp: string;
-  city: string;
-  region: string;
-  country: string;
-  coordinates: [number, number];
+  sessionLocation: {
+    longitude: number;
+    latitude: number;
+    city: string;
+    country: string;
+  };
+  participantCount: number;
+  sessionTimer: number;
+  isExpirationTimeSet: boolean;
+  isProjectModeOn: boolean;
+  sessionLocked: boolean;
   participants: Array<{
     userId: string;
     username: string;
+    assignedColor: string;
     joinedAt: Date;
-    isActive: boolean;
   }>;
-  isExpired: boolean;
+  sessionExpired: boolean;
   createdAt?: Date;
   updatedAt?: Date;
-}
-
-export interface IPopulatedSession extends Omit<ISession, "participants"> {
-  participants: IParticipant[];
 }

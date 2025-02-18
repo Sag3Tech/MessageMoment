@@ -119,11 +119,11 @@ const Cloudflare = () => {
           ...prev,
           code: response.data.sessionId,
           url: generatedUrl,
-          secureCode: response.data.secureSecurityCode || "",
+          secureCode: response.data.sessionSecurityCode || "",
         }));
 
         setUrl(generatedUrl);
-        setSecureCode(response.data.secureSecurityCode || "");
+        setSecureCode(response.data.sessionSecurityCode || "");
         setNotificationType("reg");
         toggleVisibility("reg");
       }

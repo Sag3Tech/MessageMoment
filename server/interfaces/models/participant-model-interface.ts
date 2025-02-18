@@ -2,17 +2,17 @@ import { Document } from "mongoose";
 
 export interface IParticipant extends Document {
   sessionId: string;
-  participantId: string;
+  userId: string;
   username: string;
-  isActive: boolean;
-  assignedColor: string;
-  connectionLocation: {
+  participantIp: string;
+  participantLocation: {
+    longitude: number;
+    latitude: number;
     city: string;
-    region: string;
     country: string;
-    coordinates: [number, number];
   };
-  joinedAt: Date;
+  assignedColor: string;
+  hasLockedSession: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Join Session</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+      }
+      input {
+        width: 80%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      button {
+        padding: 10px 20px;
+        border: none;
+        background-color: #28a745;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      button:hover {
+        background-color: #218838;
+      }
+      #output {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        background-color: #f9f9f9;
+        min-height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Join a Session</h2>
+
+    <label>Session ID:</label>
+    <input type="text" id="sessionId" placeholder="Enter session ID" required />
+
+    <label>Username:</label>
+    <input
+      type="text"
+      id="username"
+      placeholder="Enter your username"
+      required
+    />
+
+    <label>Session Security Code (if required):</label>
+    <input
+      type="text"
+      id="sessionSecurityCode"
+      placeholder="Enter security code (if secure)"
+    />
+
+    <button onclick="joinSession()">Join Session</button>
+
+    <div id="output"></div>
+
+    <script>
+      const socket = io("http://localhost:8000");
+
+      function joinSession() {
+        const sessionId = document.getElementById("sessionId").value;
+        const username = document.getElementById("username").value;
+        const sessionSecurityCode = document.getElementById(
+          "sessionSecurityCode"
+        ).value;
+
+        if (!sessionId || !username) {
+          alert("Session ID and Username are required!");
+          return;
+        }
+
+        socket.emit("joinRoom", { sessionId, sessionSecurityCode, username });
+        logMessage("🔵 Attempting to join session...");
+      }
+
+      // Listen for successful join confirmation
+      socket.on("joinedRoom", (data) => {
+        logMessage(`✅ Successfully joined session ${data.sessionId}`);
+        logMessage(`🎨 Assigned Color: ${data.assignedColor}`);
+      });
+
+      // Listen for errors
+      socket.on("error", (message) => {
+        logMessage(`❌ Error: ${message}`);
+      });
+
+      // Listen for redirects
+      socket.on("redirect", (url) => {
+        logMessage(`⚠️ Redirecting to: ${url}`);
+        setTimeout(() => {
+          window.location.href = url;
+        }, 2000);
+      });
+
+      // Listen for other users joining
+      socket.on("userJoined", (data) => {
+        logMessage(`👤 ${data.username} joined the session.`);
+      });
+
+      function logMessage(message) {
+        const output = document.getElementById("output");
+        output.innerHTML += `<p>${message}</p>`;
+      }
+    </script>
+  </body>
+</html>
